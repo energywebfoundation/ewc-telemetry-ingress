@@ -70,7 +70,7 @@ namespace webapi
                 // Decode payload and signature to bytes
                 ASCIIEncoding byteConverter = new ASCIIEncoding();
                 byte[] payloadBytes = byteConverter.GetBytes(payload);
-                byte[] signatureBytes = byteConverter.GetBytes(signature);
+                byte[] signatureBytes = Convert.FromBase64String(signature);
 
                 
                 // Get csp and load public key

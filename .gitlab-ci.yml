@@ -1,5 +1,6 @@
 stages:
   - build
+  - tests
   - package
 
 build-dotnet:
@@ -13,7 +14,17 @@ build-dotnet:
   artifacts:
     untracked: false
     paths:
-      - build/
+      - ingress-app/build/
+
+test-dotnet:
+  stage: test
+  tags:
+    - short-jobs
+  image: microsoft/dotnet:2.2-sdk
+  script:
+    - dotnet restore
+    - dotnet build
+    - dotnet test --no-build -v=normal tests
 
 package-docker:
   stage: package
