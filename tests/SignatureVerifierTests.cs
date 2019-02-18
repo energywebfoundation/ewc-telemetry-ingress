@@ -1,8 +1,106 @@
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 using webapi;
+using webapi.Controllers;
 using Xunit;
 
 namespace tests
 {
+
+    public class InfluxIngressTests
+    {
+        [Fact]
+        public void ValidMetricsShouldRecord()
+        {
+            
+            var dummyInflux = new DummyInflux();
+            var keystore = new MockKeystore();
+            keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
+         
+            
+            TelemetryController tc = new TelemetryController(keystore,dummyInflux);
+            ActionResult webResponse = tc.PostInfluxTelemetry(new InfluxTelemetry
+            {
+                NodeId = "node-1",
+                Signature = "GT+8qiTNx2X2jtE0YQOBH6EE6Pu+a6DUFMK//LU+wiIwp/OPvaO7h2SDlU40/MAt83R4ZzVT2IBrl37phKUhbiBN0sMmvgxGJdJAOkAjKtgtacqUUxuVGim4PE6pAIAEIRoETQMe7ZlsALcoyA1p5M8Y1481bM1ykNcKQ23QPuM=",
+                InfluxLines = new List<string>
+                {
+                    "weather,location=us-midwest temperature=82 1465839830100400200",
+                    "weather,location=us-east temperature=75 1465839830100400200"
+                }
+            });
+
+            Assert.IsType<AcceptedResult>(webResponse);
+            Assert.Equal(2,dummyInflux.LastInsertCount);
+        }
+        
+        [Fact]
+        public void InvalidSignatureShouldNotRecord()
+        {
+            
+            var dummyInflux = new DummyInflux();
+            var keystore = new MockKeystore();
+            keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
+         
+            
+            TelemetryController tc = new TelemetryController(keystore,dummyInflux);
+            ActionResult webResponse = tc.PostInfluxTelemetry(new InfluxTelemetry
+            {
+                NodeId = "node-1",
+                Signature = "GT+8qiTNx2X2jtE0YQOBH6EE6Pu+a6DUFMK//LU+wiIwp/OPvaO7h2SDlU40/MAt83R4ZzVT2IBrl37phKUhbiBN0sMmvgxGJdJAOkAjKtgtacqUUxuVGim4PE6pAIAEIRoETQMe7ZlsALcoyA1p5M8Y1481bM1ykNcKQ23QPuM=",
+                InfluxLines = new List<string>
+                {
+                    "weather,location=us-midwest temperature=82 1465839830100400200"
+                }
+            });
+
+            Assert.IsType<ForbidResult>(webResponse);
+            Assert.Equal(0,dummyInflux.LastInsertCount);
+        }
+        
+        [Fact]
+        public void NullTelemetryShouldNotRecord()
+        {
+            
+            var dummyInflux = new DummyInflux();
+            var keystore = new MockKeystore();
+            keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
+         
+            
+            TelemetryController tc = new TelemetryController(keystore,dummyInflux);
+            ActionResult webResponse = tc.PostInfluxTelemetry(new InfluxTelemetry
+            {
+                NodeId = null,
+                Signature = null,
+                InfluxLines = null
+            });
+
+            Assert.IsType<BadRequestResult>(webResponse);
+            Assert.Equal(0,dummyInflux.LastInsertCount);
+        }
+        
+        [Fact]
+        public void EmptyTelemetryShouldNotRecord()
+        {
+            
+            var dummyInflux = new DummyInflux();
+            var keystore = new MockKeystore();
+            keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
+         
+            
+            TelemetryController tc = new TelemetryController(keystore,dummyInflux);
+            ActionResult webResponse = tc.PostInfluxTelemetry(new InfluxTelemetry
+            {
+                NodeId = "",
+                Signature = "",
+                InfluxLines = new List<string>()
+            });
+
+            Assert.IsType<BadRequestResult>(webResponse);
+            Assert.Equal(0,dummyInflux.LastInsertCount);
+        }
+    }
+    
     public class SignatureVerifierTests
     {
         [Theory]

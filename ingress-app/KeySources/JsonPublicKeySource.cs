@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 
 namespace webapi
@@ -61,6 +62,13 @@ namespace webapi
             }
 
             return key;
+        }
+
+        public static IPublickeySource FromFile(string keyfileJson)
+        {
+            JsonPublicKeySource source = new JsonPublicKeySource();
+            source.LoadFromFile(keyfileJson);
+            return source;
         }
     }
 }
