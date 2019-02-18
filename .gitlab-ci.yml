@@ -4,6 +4,8 @@ stages:
 
 build-dotnet:
   stage: build
+  tags:
+    - short-jobs
   image: microsoft/dotnet:2.2-sdk
   script:
     - dotnet restore
@@ -16,6 +18,8 @@ build-dotnet:
 package-docker:
   stage: package
   image: docker
+  tags:
+    - short-jobs
   dependencies:
     - build-dotnet
   services:
