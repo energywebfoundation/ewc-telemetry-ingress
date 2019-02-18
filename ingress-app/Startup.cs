@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using webapi.Controllers;
 
 namespace webapi
 {
@@ -19,6 +20,10 @@ namespace webapi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddSingleton<IPublickeySource>(serviceProvider => JsonPublicKeySource.FromFile("keyfile.json"));
+            services.AddSingleton<IInfluxConnector, DummyInflux>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
