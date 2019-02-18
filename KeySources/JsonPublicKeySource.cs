@@ -1,16 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace webapi
 {
     public class JsonPublicKeySource : IPublickeySource
     {
-        public JsonPublicKeySource()
-        {
-            
-        }
+        private List<JsonPublicNodeKey> _loadedKeys;
 
         public void LoadFromFile(string path)
         {
@@ -50,6 +48,19 @@ namespace webapi
             {
                 throw new KeyLoadException($"JSON contains no keys");
             }
+
+            _loadedKeys = jsonKeys;
+        }
+
+        public string GetKeyForNode(string nodeId)
+        {
+            string key = _loadedKeys.FirstOrDefault(x => x.NodeId == nodeId)?.PublicKey;
+            if (key == null)
+            {
+                throw new KeyNotFoundException("Public key not available");
+            }
+
+            return key;
         }
     }
 }
