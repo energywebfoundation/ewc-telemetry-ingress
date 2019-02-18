@@ -1,6 +1,6 @@
 stages:
   - build
-  - tests
+  - test
   - package
 
 build-dotnet:
