@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:2.2-runtime
+FROM microsoft/dotnet:2.2-aspnetcore-runtime
 
 WORKDIR /app
 ADD build .
