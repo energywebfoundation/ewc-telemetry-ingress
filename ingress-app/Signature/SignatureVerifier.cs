@@ -37,34 +37,17 @@ namespace webapi
     
     public class SignatureVerifier
     {
-        private readonly IPublickeySource _pubkeySrc;
-
-        public SignatureVerifier(IPublickeySource pubkeySrc) 
-        {
-            _pubkeySrc = pubkeySrc ?? throw new ArgumentNullException(nameof(pubkeySrc));
-        }
-
 
         /// <summary>
         /// Verifies that a given payload was signed with the correct key
         /// </summary>
         /// <param name="payload">The payload to verify</param>
         /// <param name="signature">The Signature send along with the payload</param>
-        /// <param name="nodeId">The Id of the node that signed this</param>
+        /// <param name="publicKey">The Public key of the keypair that signed the payload</param>
         /// <returns>true if signature is valid, otherwise false</returns>
-        public bool IsSignatureValid(string payload, string signature, string nodeId)
+        public static bool IsSignatureValid(string payload, string signature, string publicKey)
         {
-
-            string publicKey;
-            try
-            {
-                publicKey = _pubkeySrc.GetKeyForNode(nodeId);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Unable to find key for nodeId",ex);
-            }
-            
+           
             try
             {
                 // Decode payload and signature to bytes

@@ -21,10 +21,7 @@ namespace tests
             "absAUKYl78KAI3aA8FDWE2y2JATOCz7OUKG1hVhFNOyjSfwlGXhMA4oe3qou6JEnuKlsx+AqS5O+nz0oJ68FR7gLU8NPrWjVIWqFTyQMS0ntDRMEUl3oZXXD24fy+NaUOZ6o9OPxFASlEN/ueplXSgcedpXLfo0cfWQWM0GcTJ4=")]
         public void SignatureShouldVerify(string pubKey, string payload, string signature)
         {
-            MockKeystore keystore = new MockKeystore {NodeKey = pubKey};
-
-            SignatureVerifier verifier = new SignatureVerifier(keystore);
-            bool isValid = verifier.IsSignatureValid(payload, signature, "dummy");
+            bool isValid = SignatureVerifier.IsSignatureValid(payload, signature, pubKey);
             Assert.True(isValid);
         }
         
@@ -45,10 +42,7 @@ namespace tests
             "absAUKYl78KAI3aA8FDWE2y2JATOCz7OUKG1hVhFNOyjSfwlGXhMA4oe3qou6JEnuKlsx+AqS5O+nz0oJ68FR7gLU8NPrWjVIWqFTyQMS0ntDRMEUl3oZXXD24fy+NaUOZ6o9OPxFASlEN/ueplXSgcedpXLfo0cfWQWM0GcTJ4=")]
         public void SignatureShouldNotVerify(string pubKey, string payload, string signature)
         {
-            MockKeystore keystore = new MockKeystore {NodeKey = pubKey};
-
-            SignatureVerifier verifier = new SignatureVerifier(keystore);
-            bool isValid = verifier.IsSignatureValid(payload, signature, "dummy");
+            bool isValid = SignatureVerifier.IsSignatureValid(payload, signature, pubKey);
             Assert.True(!isValid);
         }
     }
