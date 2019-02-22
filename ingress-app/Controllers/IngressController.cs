@@ -1,16 +1,17 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 namespace webapi.Controllers
 {
-    [Route("api/telemetry")]
+    [Route("api/ingress")]
     [ApiController]
-    public class TelemetryController : ControllerBase
+    public class IngressController : ControllerBase
     {
         private readonly IPublickeySource _keyStore;
         private readonly IInfluxConnector _influx;
 
-        public TelemetryController(IPublickeySource keystore, IInfluxConnector influx)
+        public IngressController(IPublickeySource keystore, IInfluxConnector influx)
         {
             _keyStore = keystore;
             _influx = influx;
@@ -18,13 +19,13 @@ namespace webapi.Controllers
         
         // POST api/values
         [HttpPost("influx")]
-        public ActionResult PostInfluxTelemetry([FromBody] InfluxTelemetry telemetryPackage)
+        public async Task<ActionResult> PostInfluxTelemetry([FromBody] InfluxTelemetry telemetryPackage)
         {
             // verify
             if (telemetryPackage?.NodeId == null || 
                 string.IsNullOrWhiteSpace(telemetryPackage.Signature) || 
-                telemetryPackage.InfluxLines == null || 
-                telemetryPackage.InfluxLines.Count == 0)
+                telemetryPackage.Payload == null || 
+                telemetryPackage.Payload.Count == 0)
             {
                 return BadRequest();
             }
@@ -41,7 +42,7 @@ namespace webapi.Controllers
             }
 
             // Verify Signature
-            string signedPayload =  string.Join("", telemetryPackage.InfluxLines);
+            string signedPayload =  string.Join("", telemetryPackage.Payload);
             bool signatureValid = SignatureVerifier.IsSignatureValid(signedPayload, telemetryPackage.Signature, nodeKey);
 
             if (!signatureValid)
@@ -50,7 +51,7 @@ namespace webapi.Controllers
             }
             
             // Signature valid - record to db
-            _influx.Record(telemetryPackage.InfluxLines);
+            await Task.Run(() => _influx.Record(telemetryPackage.Payload));
 
             return Accepted();
         }

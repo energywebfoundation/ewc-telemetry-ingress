@@ -10,7 +10,7 @@ namespace tests
     public class InfluxIngressTests
     {
         [Fact]
-        public void ValidMetricsShouldRecord()
+        public async void ValidMetricsShouldRecordAsync()
         {
             
             var dummyInflux = new DummyInflux();
@@ -18,12 +18,12 @@ namespace tests
             keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
          
             
-            TelemetryController tc = new TelemetryController(keystore,dummyInflux);
-            ActionResult webResponse = tc.PostInfluxTelemetry(new InfluxTelemetry
+            IngressController tc = new IngressController(keystore,dummyInflux);
+            ActionResult webResponse = await tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = "node-1",
                 Signature = "GT+8qiTNx2X2jtE0YQOBH6EE6Pu+a6DUFMK//LU+wiIwp/OPvaO7h2SDlU40/MAt83R4ZzVT2IBrl37phKUhbiBN0sMmvgxGJdJAOkAjKtgtacqUUxuVGim4PE6pAIAEIRoETQMe7ZlsALcoyA1p5M8Y1481bM1ykNcKQ23QPuM=",
-                InfluxLines = new List<string>
+                Payload = new List<string>
                 {
                     "weather,location=us-midwest temperature=82 1465839830100400200",
                     "weather,location=us-east temperature=75 1465839830100400200"
@@ -35,7 +35,7 @@ namespace tests
         }
         
         [Fact]
-        public void InvalidSignatureShouldNotRecord()
+        public async void InvalidSignatureShouldNotRecordAsync()
         {
             
             var dummyInflux = new DummyInflux();
@@ -43,12 +43,12 @@ namespace tests
             keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
          
             
-            TelemetryController tc = new TelemetryController(keystore,dummyInflux);
-            ActionResult webResponse = tc.PostInfluxTelemetry(new InfluxTelemetry
+            IngressController tc = new IngressController(keystore,dummyInflux);
+            ActionResult webResponse = await tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = "node-1",
                 Signature = "GT+8qiTNx2X2jtE0YQOBH6EE6Pu+a6DUFMK//LU+wiIwp/OPvaO7h2SDlU40/MAt83R4ZzVT2IBrl37phKUhbiBN0sMmvgxGJdJAOkAjKtgtacqUUxuVGim4PE6pAIAEIRoETQMe7ZlsALcoyA1p5M8Y1481bM1ykNcKQ23QPuM=",
-                InfluxLines = new List<string>
+                Payload = new List<string>
                 {
                     "weather,location=us-midwest temperature=82 1465839830100400200"
                 }
@@ -59,7 +59,7 @@ namespace tests
         }
         
         [Fact]
-        public void NullTelemetryShouldNotRecord()
+        public async void NullTelemetryShouldNotRecord()
         {
             
             var dummyInflux = new DummyInflux();
@@ -67,12 +67,12 @@ namespace tests
             keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
          
             
-            TelemetryController tc = new TelemetryController(keystore,dummyInflux);
-            ActionResult webResponse = tc.PostInfluxTelemetry(new InfluxTelemetry
+            IngressController tc = new IngressController(keystore,dummyInflux);
+            ActionResult webResponse = await tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = null,
                 Signature = null,
-                InfluxLines = null
+                Payload = null
             });
 
             Assert.IsType<BadRequestResult>(webResponse);
@@ -80,7 +80,7 @@ namespace tests
         }
         
         [Fact]
-        public void EmptyTelemetryShouldNotRecord()
+        public async void EmptyTelemetryShouldNotRecord()
         {
             
             var dummyInflux = new DummyInflux();
@@ -88,12 +88,12 @@ namespace tests
             keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
          
             
-            TelemetryController tc = new TelemetryController(keystore,dummyInflux);
-            ActionResult webResponse = tc.PostInfluxTelemetry(new InfluxTelemetry
+            IngressController tc = new IngressController(keystore,dummyInflux);
+            ActionResult webResponse = await tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = "",
                 Signature = "",
-                InfluxLines = new List<string>()
+                Payload = new List<string>()
             });
 
             Assert.IsType<BadRequestResult>(webResponse);
