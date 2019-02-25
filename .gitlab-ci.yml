@@ -24,7 +24,7 @@ test-dotnet:
   services:
     - name:influxdb
       alias:influxdb
-      Ccommand:["influx -execute 'CREATE DATABASE testdb'"]
+      Command:["influx -execute 'CREATE DATABASE testdb'"]
   script:
     - 
     - dotnet restore
