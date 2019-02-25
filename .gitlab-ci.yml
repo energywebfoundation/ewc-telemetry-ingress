@@ -23,10 +23,9 @@ test-dotnet:
   image: microsoft/dotnet:2.2-sdk
   services:
     - name:influxdb
-      alias:influxdb
-      Command:["influx -execute 'CREATE DATABASE testdb'"]
+    - alias:influxdb
+    - Command:["influx -execute 'CREATE DATABASE testdb'"]
   script:
-    - 
     - dotnet restore
     - dotnet build
     - dotnet test --no-build -v=normal tests
