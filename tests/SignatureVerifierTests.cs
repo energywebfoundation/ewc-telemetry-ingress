@@ -1,30 +1,55 @@
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using webapi;
 using webapi.Controllers;
 using Xunit;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Net;
+using System.Linq;
 
 namespace tests
 {
 
+    
     public class InfluxIngressTests
     {
-         public static IConfiguration InitConfiguration()
+        public static LineProtocolConParams InitConfiguration()
         {
-            var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.test.json")
-                .Build();
-            return config;
+             bool from_file = false;
+            IConfigurationRoot config = null;
+            LineProtocolConParams conf_fileobj = null;
+
+            if (from_file)
+            {
+                config = new ConfigurationBuilder()
+                    .SetBasePath(System.AppContext.BaseDirectory)
+                    .AddJsonFile("appsettings.test.json")
+                    .Build();
+                config.GetSection("Influx").Get<LineProtocolConParams>();
+            }
+
+            var conf_hcobj = new LineProtocolConParams() { Address = new Uri("http://localhost:8086"), DBName = "testdb", User = "root", Password = "root", FlushBufferItemsSize = 2, FlushBufferSeconds = 3, UseGzipCompression = true };
+            return from_file ? conf_fileobj : conf_hcobj;
+        }
+
+        public static string InfluxCon(LineProtocolConParams conobj)
+        {
+            var client = new WebClient();
+            var queryString = Uri.EscapeUriString("db=" + Uri.EscapeDataString(conobj.DBName) + "&q=SELECT * FROM \"weather\"");
+            var queryUrl = conobj.Address + "query?" + queryString;
+            return client.DownloadString(queryUrl);
         }
 
         [Fact]
         public async void ValidMetricsShouldRecordAsync()
         {
 
-            var config = InitConfiguration().GetSection("Influx");
-            var conobj = config.Get<LineProtocolConParams>();
+            var conobj = InitConfiguration();
             var InfluxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
 
@@ -43,15 +68,22 @@ namespace tests
             });
 
             Assert.IsType<AcceptedResult>(webResponse);
+           
+            System.Threading.Thread.Sleep(8000); //wait for Queue to flush
             Assert.Equal(2, InfluxLib.LastInsertCount);
+
+            /*JObject pobj = JObject.Parse(InfluxCon(conobj));
+            var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
+            var in_count = rows.Children().Count();
+            Assert.Equal(2, in_count);//Check if row count is now 2
+            */
         }
- 
+
         [Fact]
         public async void InvalidSignatureShouldNotRecordAsync()
         {
 
-            var config = InitConfiguration().GetSection("Influx");
-            var conobj = config.Get<LineProtocolConParams>();
+            var conobj = InitConfiguration();
             var InfluxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
             keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
@@ -70,14 +102,17 @@ namespace tests
 
             Assert.IsType<ForbidResult>(webResponse);
             Assert.Equal(0, InfluxLib.LastInsertCount);
+            /* JObject pobj = JObject.Parse(InfluxCon(conobj));
+            var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
+            var in_count = rows.Children().Count();
+            Assert.Equal(2, in_count);//Check if row count have not increased after first test case
+        */
         }
 
         [Fact]
         public async void NullTelemetryShouldNotRecord()
         {
-
-            var config = InitConfiguration().GetSection("Influx");
-            var conobj = config.Get<LineProtocolConParams>();
+            var conobj = InitConfiguration();
             var InfluxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
 
@@ -94,14 +129,17 @@ namespace tests
 
             Assert.IsType<BadRequestResult>(webResponse);
             Assert.Equal(0, InfluxLib.LastInsertCount);
+            /* JObject pobj = JObject.Parse(InfluxCon(conobj));
+            var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
+            var in_count = rows.Children().Count();
+            //Assert.Equal(2, in_count);//Check if row count have not increased after first test case
+            */
         }
 
         [Fact]
         public async void EmptyTelemetryShouldNotRecord()
         {
-
-            var config = InitConfiguration().GetSection("Influx");
-            var conobj = config.Get<LineProtocolConParams>();
+            var conobj = InitConfiguration();
             var InfluxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
             keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
@@ -117,7 +155,13 @@ namespace tests
 
             Assert.IsType<BadRequestResult>(webResponse);
             Assert.Equal(0, InfluxLib.LastInsertCount);
+            /* JObject pobj = JObject.Parse(InfluxCon(conobj));
+            var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
+            var in_count = rows.Children().Count();
+            //Assert.Equal(2, in_count);//Check if row count have not increased after first test case
+            */
         }
+
     }
 
     public class SignatureVerifierTests

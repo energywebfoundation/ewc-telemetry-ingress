@@ -18,4 +18,9 @@
     <ProjectReference Include="..\ingress-app\telemetry-ingress.csproj" />
   </ItemGroup>
 
+    <ItemGroup>
+        <None Include="appsettings.test.json" CopyToOutputDirectory="Always" />
+    </ItemGroup>
+
+
 </Project>

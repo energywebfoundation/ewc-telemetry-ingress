@@ -10,7 +10,14 @@ using System.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Collections.Generic;
 
-
+/*
+TODOs:
+    - Define Influx RTO, according to that write requests on disk and once Influx is up read requests and resent to Influx
+    - Optimazation testing - buffer flush settings time and # of requests
+    - Making buffer fail safe
+    - Influx response based buffer behavior ( for minor faliures handle internally)
+    - Application level Logging
+ */
 namespace webapi.Controllers
 {
     public class InfluxClient : IInfluxClient
@@ -58,7 +65,7 @@ namespace webapi.Controllers
             string httpStatusCode = ((int)response.StatusCode).ToString();
 
             if (response.IsSuccessStatusCode){
-                LastInsertCount+=content.Count;
+                LastInsertCount=content.Count;
                 return httpStatusCode;}
 
             string errorMessage = await response.Content.ReadAsStringAsync();
