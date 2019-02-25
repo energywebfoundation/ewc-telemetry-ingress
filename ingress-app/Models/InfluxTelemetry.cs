@@ -8,7 +8,7 @@ namespace webapi
         [JsonProperty("nodeid")]
         public string NodeId { get; set; } 
         [JsonProperty("payload")]
-        public List<string> Payload { get; set; }
+        public IList<string> Payload { get; set; }
         [JsonProperty("signature")]
         public string Signature { get; set; }    
     }

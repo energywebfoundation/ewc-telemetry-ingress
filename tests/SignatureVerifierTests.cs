@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using webapi;
 using webapi.Controllers;
 using Xunit;
@@ -9,16 +11,26 @@ namespace tests
 
     public class InfluxIngressTests
     {
+         public static IConfiguration InitConfiguration()
+        {
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.test.json")
+                .Build();
+            return config;
+        }
+
         [Fact]
         public async void ValidMetricsShouldRecordAsync()
         {
-            
-            var dummyInflux = new DummyInflux();
+
+            var config = InitConfiguration().GetSection("Influx");
+            var conobj = config.Get<LineProtocolConParams>();
+            var InfluxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
+
             keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
-         
-            
-            IngressController tc = new IngressController(keystore,dummyInflux);
+
+            IngressController tc = new IngressController(keystore, InfluxLib);
             ActionResult webResponse = await tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = "node-1",
@@ -31,19 +43,21 @@ namespace tests
             });
 
             Assert.IsType<AcceptedResult>(webResponse);
-            Assert.Equal(2,dummyInflux.LastInsertCount);
+            Assert.Equal(2, InfluxLib.LastInsertCount);
         }
-        
+ 
         [Fact]
         public async void InvalidSignatureShouldNotRecordAsync()
         {
-            
-            var dummyInflux = new DummyInflux();
+
+            var config = InitConfiguration().GetSection("Influx");
+            var conobj = config.Get<LineProtocolConParams>();
+            var InfluxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
             keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
-         
-            
-            IngressController tc = new IngressController(keystore,dummyInflux);
+
+
+            IngressController tc = new IngressController(keystore, InfluxLib);
             ActionResult webResponse = await tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = "node-1",
@@ -55,19 +69,22 @@ namespace tests
             });
 
             Assert.IsType<ForbidResult>(webResponse);
-            Assert.Equal(0,dummyInflux.LastInsertCount);
+            Assert.Equal(0, InfluxLib.LastInsertCount);
         }
-        
+
         [Fact]
         public async void NullTelemetryShouldNotRecord()
         {
-            
-            var dummyInflux = new DummyInflux();
+
+            var config = InitConfiguration().GetSection("Influx");
+            var conobj = config.Get<LineProtocolConParams>();
+            var InfluxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
+
             keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
-         
-            
-            IngressController tc = new IngressController(keystore,dummyInflux);
+
+
+            IngressController tc = new IngressController(keystore, InfluxLib);
             ActionResult webResponse = await tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = null,
@@ -76,19 +93,21 @@ namespace tests
             });
 
             Assert.IsType<BadRequestResult>(webResponse);
-            Assert.Equal(0,dummyInflux.LastInsertCount);
+            Assert.Equal(0, InfluxLib.LastInsertCount);
         }
-        
+
         [Fact]
         public async void EmptyTelemetryShouldNotRecord()
         {
-            
-            var dummyInflux = new DummyInflux();
+
+            var config = InitConfiguration().GetSection("Influx");
+            var conobj = config.Get<LineProtocolConParams>();
+            var InfluxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
             keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
-         
-            
-            IngressController tc = new IngressController(keystore,dummyInflux);
+
+
+            IngressController tc = new IngressController(keystore, InfluxLib);
             ActionResult webResponse = await tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = "",
@@ -97,10 +116,10 @@ namespace tests
             });
 
             Assert.IsType<BadRequestResult>(webResponse);
-            Assert.Equal(0,dummyInflux.LastInsertCount);
+            Assert.Equal(0, InfluxLib.LastInsertCount);
         }
     }
-    
+
     public class SignatureVerifierTests
     {
         [Theory]
@@ -122,8 +141,8 @@ namespace tests
             bool isValid = SignatureVerifier.IsSignatureValid(payload, signature, pubKey);
             Assert.True(isValid);
         }
-        
-        
+
+
         [Theory]
         [InlineData(
             "BgIAAACkAABSU0ExAAQAAAEAAQCBj/4c2efRhDzwFlqwoobNjHIgrG7M5eI3wiUlZCK5y7nlWltSOk6plEFFz6Efp8EJxyQhqqC+QnIJlpmtUmtKzZAqGV4RDcB25h+klvyUGxmOXS0YLFte3k84526ldiOFZuCI1iGW3LDeKMdD+grOQ/CdFovoz/7o/DdEwEmIsg==",
