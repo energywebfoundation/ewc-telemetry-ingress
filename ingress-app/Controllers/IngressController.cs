@@ -42,7 +42,7 @@ namespace webapi.Controllers
             }
             catch (KeyNotFoundException)
             {
-                return Forbid();
+                return StatusCode(403);
             }
 
             // Verify Signature
@@ -51,7 +51,7 @@ namespace webapi.Controllers
 
             if (!signatureValid)
             {
-                return Forbid();
+                return StatusCode(403);
             }
 
             try
@@ -63,7 +63,9 @@ namespace webapi.Controllers
             }
             catch (Exception ex)
             {
-               return BadRequest(ex.ToString());
+                //return BadRequest(ex.ToString());
+                //TODO Logging error instead of sending back to client
+                return StatusCode(400);
             }
 
             return Accepted();
