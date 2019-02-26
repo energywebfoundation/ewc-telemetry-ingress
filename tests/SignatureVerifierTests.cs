@@ -18,26 +18,26 @@ namespace tests
     
     public class InfluxIngressTests
     {
-        public static LineProtocolConParams InitConfiguration()
+        public static LineProtocolConnectionParameters InitConfiguration()
         {
-             bool from_file = false;
-            IConfigurationRoot config = null;
-            LineProtocolConParams conf_fileobj = null;
+            bool from_file = false;
+            LineProtocolConnectionParameters conf_fileobj = null;
 
             if (from_file)
             {
-                config = new ConfigurationBuilder()
-                    .SetBasePath(System.AppContext.BaseDirectory)
-                    .AddJsonFile("appsettings.test.json")
-                    .Build();
-                config.GetSection("Influx").Get<LineProtocolConParams>();
+                ConfigurationBuilder cb = new ConfigurationBuilder();
+                cb.SetBasePath(System.AppContext.BaseDirectory);
+                cb.AddJsonFile("appsettings.test.json");
+                IConfigurationRoot cr = cb.Build();
+                conf_fileobj = cr.GetSection("Influx").Get<LineProtocolConnectionParameters>();
+            }else{
+                conf_fileobj = new LineProtocolConnectionParameters() { Address = new Uri("http://influxdb:8086"), DBName = "testdb", User = "root", Password = "root", FlushBufferItemsSize = 2, FlushBufferSeconds = 3, UseGzipCompression = true };
             }
 
-            var conf_hcobj = new LineProtocolConParams() { Address = new Uri("http://influxdb:8086"), DBName = "testdb", User = "root", Password = "root", FlushBufferItemsSize = 2, FlushBufferSeconds = 3, UseGzipCompression = true };
-            return from_file ? conf_fileobj : conf_hcobj;
+            return conf_fileobj;
         }
 
-        public static string InfluxCon(LineProtocolConParams conobj)
+        public static string InfluxCon(LineProtocolConnectionParameters conobj)
         {
             var client = new WebClient();
             var queryString = Uri.EscapeUriString("db=" + Uri.EscapeDataString(conobj.DBName) + "&q=SELECT * FROM \"weather\"");

@@ -27,7 +27,7 @@ namespace webapi
 
             services.AddSingleton <IInfluxClient, InfluxClient>(serviceProvider =>
                 {
-                    var lpcp = Configuration.GetSection("Influx").Get<LineProtocolConParams>();
+                    var lpcp = Configuration.GetSection("Influx").Get<LineProtocolConnectionParameters>();
                     return new InfluxClient(lpcp);
                 
                 });

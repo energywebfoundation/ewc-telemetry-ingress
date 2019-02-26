@@ -2,7 +2,7 @@ using System;
 
 namespace webapi
 {
-    public class LineProtocolConParams
+    public class LineProtocolConnectionParameters
     {
         public Uri Address { get; set; }
 
