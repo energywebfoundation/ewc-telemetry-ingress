@@ -76,7 +76,9 @@ namespace webapi
             }
             catch(Exception ex)
             {
-                throw new SignatureVerifyException("Unable to verify signature",ex);
+                //throw new SignatureVerifyException("Unable to verify signature",ex);
+                //TO DO we can log this afterMVP but verify sig method must return false
+                return false;
             }
         }
 
