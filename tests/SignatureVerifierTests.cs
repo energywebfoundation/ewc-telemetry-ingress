@@ -30,8 +30,17 @@ namespace tests
                 cb.AddJsonFile("appsettings.test.json");
                 IConfigurationRoot cr = cb.Build();
                 conf_fileobj = cr.GetSection("Influx").Get<LineProtocolConnectionParameters>();
+
             }else{
-                conf_fileobj = new LineProtocolConnectionParameters() { Address = new Uri("http://influxdb:8086"), DBName = "testdb", User = "root", Password = "root", FlushBufferItemsSize = 2, FlushBufferSeconds = 3, UseGzipCompression = true };
+
+                conf_fileobj = new LineProtocolConnectionParameters() { 
+                    Address = new Uri("http://influxdb:8086"), 
+                    DBName = "testdb", 
+                    User = "root", 
+                    Password = "root", 
+                    FlushBufferItemsSize = 2, 
+                    FlushBufferSeconds = 3, 
+                    UseGzipCompression = true };
             }
 
             return conf_fileobj;
