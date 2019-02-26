@@ -33,7 +33,7 @@ namespace tests
                 config.GetSection("Influx").Get<LineProtocolConParams>();
             }
 
-            var conf_hcobj = new LineProtocolConParams() { Address = new Uri("http://localhost:8086"), DBName = "testdb", User = "root", Password = "root", FlushBufferItemsSize = 2, FlushBufferSeconds = 3, UseGzipCompression = true };
+            var conf_hcobj = new LineProtocolConParams() { Address = new Uri("http://influxdb:8086"), DBName = "testdb", User = "root", Password = "root", FlushBufferItemsSize = 2, FlushBufferSeconds = 3, UseGzipCompression = true };
             return from_file ? conf_fileobj : conf_hcobj;
         }
 
