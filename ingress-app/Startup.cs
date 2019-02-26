@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -22,7 +23,14 @@ namespace webapi
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddSingleton<IPublickeySource>(serviceProvider => JsonPublicKeySource.FromFile("keyfile.json"));
-            services.AddSingleton<IInfluxConnector, DummyInflux>();
+
+
+            services.AddSingleton <IInfluxClient, InfluxClient>(serviceProvider =>
+                {
+                    var lpcp = Configuration.GetSection("Influx").Get<LineProtocolConnectionParameters>();
+                    return new InfluxClient(lpcp);
+                
+                });
 
         }
 
@@ -39,7 +47,7 @@ namespace webapi
                 app.UseHsts();
                 app.UseHttpsRedirection();
             }
-            
+
             app.UseMvc();
         }
     }

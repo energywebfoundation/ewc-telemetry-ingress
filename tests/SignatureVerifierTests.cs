@@ -1,29 +1,75 @@
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using webapi;
 using webapi.Controllers;
 using Xunit;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Net;
+using System.Linq;
 
 namespace tests
 {
 
+    
     public class InfluxIngressTests
     {
-        [Fact]
-        public void ValidMetricsShouldRecord()
+        public static LineProtocolConnectionParameters InitConfiguration()
         {
-            
-            var dummyInflux = new DummyInflux();
+            bool from_file = false;
+            LineProtocolConnectionParameters conf_fileobj = null;
+
+            if (from_file)
+            {
+                ConfigurationBuilder cb = new ConfigurationBuilder();
+                cb.SetBasePath(System.AppContext.BaseDirectory);
+                cb.AddJsonFile("appsettings.test.json");
+                IConfigurationRoot cr = cb.Build();
+                conf_fileobj = cr.GetSection("Influx").Get<LineProtocolConnectionParameters>();
+
+            }else{
+
+                conf_fileobj = new LineProtocolConnectionParameters() { 
+                    Address = new Uri("http://influxdb:8086"), 
+                    DBName = "testdb", 
+                    User = "root", 
+                    Password = "root", 
+                    FlushBufferItemsSize = 2, 
+                    FlushBufferSeconds = 3, 
+                    UseGzipCompression = true };
+            }
+
+            return conf_fileobj;
+        }
+
+        public static string InfluxCon(LineProtocolConnectionParameters conobj)
+        {
+            var client = new WebClient();
+            var queryString = Uri.EscapeUriString("db=" + Uri.EscapeDataString(conobj.DBName) + "&q=SELECT * FROM \"weather\"");
+            var queryUrl = conobj.Address + "query?" + queryString;
+            return client.DownloadString(queryUrl);
+        }
+
+        [Fact]
+        public async void ValidMetricsShouldRecordAsync()
+        {
+
+            var conobj = InitConfiguration();
+            var InfluxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
+
             keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
-         
-            
-            TelemetryController tc = new TelemetryController(keystore,dummyInflux);
-            ActionResult webResponse = tc.PostInfluxTelemetry(new InfluxTelemetry
+
+            IngressController tc = new IngressController(keystore, InfluxLib);
+            ActionResult webResponse = await tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = "node-1",
                 Signature = "GT+8qiTNx2X2jtE0YQOBH6EE6Pu+a6DUFMK//LU+wiIwp/OPvaO7h2SDlU40/MAt83R4ZzVT2IBrl37phKUhbiBN0sMmvgxGJdJAOkAjKtgtacqUUxuVGim4PE6pAIAEIRoETQMe7ZlsALcoyA1p5M8Y1481bM1ykNcKQ23QPuM=",
-                InfluxLines = new List<string>
+                Payload = new List<string>
                 {
                     "weather,location=us-midwest temperature=82 1465839830100400200",
                     "weather,location=us-east temperature=75 1465839830100400200"
@@ -31,76 +77,102 @@ namespace tests
             });
 
             Assert.IsType<AcceptedResult>(webResponse);
-            Assert.Equal(2,dummyInflux.LastInsertCount);
+           
+            System.Threading.Thread.Sleep(8000); //wait for Queue to flush
+            Assert.Equal(2, InfluxLib.LastInsertCount);
+
+            /*JObject pobj = JObject.Parse(InfluxCon(conobj));
+            var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
+            var in_count = rows.Children().Count();
+            Assert.Equal(2, in_count);//Check if row count is now 2
+            */
         }
-        
+
         [Fact]
-        public void InvalidSignatureShouldNotRecord()
+        public async void InvalidSignatureShouldNotRecordAsync()
         {
-            
-            var dummyInflux = new DummyInflux();
+
+            var conobj = InitConfiguration();
+            var InfluxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
             keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
-         
-            
-            TelemetryController tc = new TelemetryController(keystore,dummyInflux);
-            ActionResult webResponse = tc.PostInfluxTelemetry(new InfluxTelemetry
+
+
+            IngressController tc = new IngressController(keystore, InfluxLib);
+            ActionResult webResponse = await tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = "node-1",
                 Signature = "GT+8qiTNx2X2jtE0YQOBH6EE6Pu+a6DUFMK//LU+wiIwp/OPvaO7h2SDlU40/MAt83R4ZzVT2IBrl37phKUhbiBN0sMmvgxGJdJAOkAjKtgtacqUUxuVGim4PE6pAIAEIRoETQMe7ZlsALcoyA1p5M8Y1481bM1ykNcKQ23QPuM=",
-                InfluxLines = new List<string>
+                Payload = new List<string>
                 {
                     "weather,location=us-midwest temperature=82 1465839830100400200"
                 }
             });
 
             Assert.IsType<ForbidResult>(webResponse);
-            Assert.Equal(0,dummyInflux.LastInsertCount);
+            Assert.Equal(0, InfluxLib.LastInsertCount);
+            /* JObject pobj = JObject.Parse(InfluxCon(conobj));
+            var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
+            var in_count = rows.Children().Count();
+            Assert.Equal(2, in_count);//Check if row count have not increased after first test case
+        */
         }
-        
+
         [Fact]
-        public void NullTelemetryShouldNotRecord()
+        public async void NullTelemetryShouldNotRecord()
         {
-            
-            var dummyInflux = new DummyInflux();
+            var conobj = InitConfiguration();
+            var InfluxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
+
             keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
-         
-            
-            TelemetryController tc = new TelemetryController(keystore,dummyInflux);
-            ActionResult webResponse = tc.PostInfluxTelemetry(new InfluxTelemetry
+
+
+            IngressController tc = new IngressController(keystore, InfluxLib);
+            ActionResult webResponse = await tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = null,
                 Signature = null,
-                InfluxLines = null
+                Payload = null
             });
 
             Assert.IsType<BadRequestResult>(webResponse);
-            Assert.Equal(0,dummyInflux.LastInsertCount);
+            Assert.Equal(0, InfluxLib.LastInsertCount);
+            /* JObject pobj = JObject.Parse(InfluxCon(conobj));
+            var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
+            var in_count = rows.Children().Count();
+            //Assert.Equal(2, in_count);//Check if row count have not increased after first test case
+            */
         }
-        
+
         [Fact]
-        public void EmptyTelemetryShouldNotRecord()
+        public async void EmptyTelemetryShouldNotRecord()
         {
-            
-            var dummyInflux = new DummyInflux();
+            var conobj = InitConfiguration();
+            var InfluxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
             keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
-         
-            
-            TelemetryController tc = new TelemetryController(keystore,dummyInflux);
-            ActionResult webResponse = tc.PostInfluxTelemetry(new InfluxTelemetry
+
+
+            IngressController tc = new IngressController(keystore, InfluxLib);
+            ActionResult webResponse = await tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = "",
                 Signature = "",
-                InfluxLines = new List<string>()
+                Payload = new List<string>()
             });
 
             Assert.IsType<BadRequestResult>(webResponse);
-            Assert.Equal(0,dummyInflux.LastInsertCount);
+            Assert.Equal(0, InfluxLib.LastInsertCount);
+            /* JObject pobj = JObject.Parse(InfluxCon(conobj));
+            var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
+            var in_count = rows.Children().Count();
+            //Assert.Equal(2, in_count);//Check if row count have not increased after first test case
+            */
         }
+
     }
-    
+
     public class SignatureVerifierTests
     {
         [Theory]
@@ -122,8 +194,8 @@ namespace tests
             bool isValid = SignatureVerifier.IsSignatureValid(payload, signature, pubKey);
             Assert.True(isValid);
         }
-        
-        
+
+
         [Theory]
         [InlineData(
             "BgIAAACkAABSU0ExAAQAAAEAAQCBj/4c2efRhDzwFlqwoobNjHIgrG7M5eI3wiUlZCK5y7nlWltSOk6plEFFz6Efp8EJxyQhqqC+QnIJlpmtUmtKzZAqGV4RDcB25h+klvyUGxmOXS0YLFte3k84526ldiOFZuCI1iGW3LDeKMdD+grOQ/CdFovoz/7o/DdEwEmIsg==",

@@ -1,15 +1,15 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace webapi.Controllers
+namespace webapi
 {
     public class InfluxTelemetry
     {
-        [JsonProperty("nid")]
+        [JsonProperty("nodeid")]
         public string NodeId { get; set; } 
-        [JsonProperty("lines")]
-        public List<string> InfluxLines { get; set; }
-        [JsonProperty("sig")]
+        [JsonProperty("payload")]
+        public IList<string> Payload { get; set; }
+        [JsonProperty("signature")]
         public string Signature { get; set; }    
     }
 }
