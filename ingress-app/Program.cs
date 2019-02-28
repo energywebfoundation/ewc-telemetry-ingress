@@ -37,7 +37,6 @@ namespace webapi
                 return;
             }
 
-
             IWebHost host = WebHost.CreateDefaultBuilder(args)
                 .UseConfiguration(config)
                 .UseStartup<Startup>()
