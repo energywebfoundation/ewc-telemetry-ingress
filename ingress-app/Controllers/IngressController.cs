@@ -31,6 +31,7 @@ namespace webapi.Controllers
                 telemetryPackage.Payload == null ||
                 telemetryPackage.Payload.Count == 0)
             {
+                Console.WriteLine("bad request");
                 return BadRequest();
             }
 
@@ -42,7 +43,8 @@ namespace webapi.Controllers
             }
             catch (KeyNotFoundException)
             {
-                return Forbid();
+                Console.WriteLine("node unknown");
+                return  Unauthorized();
             }
 
             // Verify Signature
@@ -51,14 +53,16 @@ namespace webapi.Controllers
 
             if (!signatureValid)
             {
-                return Forbid();
+                Console.WriteLine("bad signature");
+                return Unauthorized();
             }
 
             try
             {
-  
+
+                Console.WriteLine("Accepted telemetry: " + telemetryPackage.Signature);
                 // Signature valid - record to db
-                await Task.Run(() => _influx.Enqueue(telemetryPackage.Payload));
+                //await Task.Run(() => _influx.Enqueue(telemetryPackage.Payload));
 
             }
             catch (Exception ex)

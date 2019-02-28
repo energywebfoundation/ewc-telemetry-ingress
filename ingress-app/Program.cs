@@ -66,7 +66,7 @@ namespace webapi
                 .UseKestrel(options =>
                 {
                     options.Listen(IPAddress.Loopback, 5000);
-                    options.Listen(IPAddress.Loopback, 5001,
+                    options.Listen(IPAddress.Loopback, 5010,
                         listenOptions => { listenOptions.UseHttps(certificatePath, keyPassword); });
                 })
                 .Build();
