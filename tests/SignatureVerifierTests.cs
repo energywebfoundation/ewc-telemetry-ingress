@@ -109,7 +109,7 @@ namespace tests
                 }
             });
 
-            Assert.IsType<ForbidResult>(webResponse);
+            Assert.IsType<UnauthorizedResult>(webResponse);
             Assert.Equal(0, InfluxLib.LastInsertCount);
             /* JObject pobj = JObject.Parse(InfluxCon(conobj));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
