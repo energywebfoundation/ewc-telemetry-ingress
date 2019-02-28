@@ -19,9 +19,15 @@ namespace webapi
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
                 .AddJsonFile($"appsettings.{envName}.json", true)
-                .AddEnvironmentVariables("TELEMETRY")
+                .AddEnvironmentVariables("TELEMETRY_")
                 .AddInfluxConfigFromEnvironment()
                 .Build();
+            
+            // print config
+            foreach (var c in config.AsEnumerable())
+            {
+                Console.WriteLine($"{c.Key} ==> {c.Value}");
+            }
             
             string certificatePath = Path.Combine(config.GetValue("INTERNAL_DIR","./"),"telemetry-ingress.pfx");
             if (!File.Exists(certificatePath))

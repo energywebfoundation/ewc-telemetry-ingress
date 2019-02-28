@@ -31,16 +31,16 @@ namespace webapi.Controllers
 
         public int LastInsertCount { get; private set; } = 0;
 
-        public InfluxClient(LineProtocolConnectionParameters params_obj)
+        public InfluxClient(LineProtocolConnectionParameters paramsObj)
         {
             //populate necessary fields for Influx Connection
             _httpClientHandler = new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
-            _httpClient = new HttpClient(_httpClientHandler) { BaseAddress = params_obj.Address };
+            _httpClient = new HttpClient(_httpClientHandler) { BaseAddress = paramsObj.Address };
 
-            _requestUri = $"write?db={Uri.EscapeDataString(params_obj.DBName)}";
-            if (!string.IsNullOrEmpty(params_obj.User))
+            _requestUri = $"write?db={Uri.EscapeDataString(paramsObj.DBName)}";
+            if (!string.IsNullOrEmpty(paramsObj.User))
             {
-                _requestUri += $"&u={Uri.EscapeDataString(params_obj.User)}&p={Uri.EscapeDataString(params_obj.Password)}";
+                _requestUri += $"&u={Uri.EscapeDataString(paramsObj.User)}&p={Uri.EscapeDataString(paramsObj.Password)}";
             }
 
             //populate necessary fields for buffer
@@ -48,7 +48,7 @@ namespace webapi.Controllers
             _synSubject = Subject.Synchronize(subject);
 
             _subscription = _synSubject
-                .Buffer(TimeSpan.FromSeconds(params_obj.FlushBufferSeconds), params_obj.FlushBufferItemsSize)
+                .Buffer(TimeSpan.FromSeconds(paramsObj.FlushBufferSeconds), paramsObj.FlushBufferItemsSize)
                 .Subscribe(onNext: async (pointsList) => await SendToInflux(pointsList));
         }
 
@@ -59,14 +59,12 @@ namespace webapi.Controllers
                 return "";
             }
 
-            HttpResponseMessage response;
-
             var stringContent = new StringContent(
                 string.Join(System.Environment.NewLine, content), 
                 Encoding.UTF8, 
                 "application/json");
 
-            response = await Post(_requestUri, stringContent, cancellationToken);
+            HttpResponseMessage response = await Post(_requestUri, stringContent, cancellationToken);
 
 
             string httpStatusCode = ((int)response.StatusCode).ToString();
