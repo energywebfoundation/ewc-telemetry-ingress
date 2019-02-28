@@ -10,7 +10,8 @@ namespace webapi
     public class JsonPublicKeySource : IPublickeySource
     {
         private List<JsonPublicNodeKey> _loadedKeys;
-
+        private string _sourceFile;
+        
         public void LoadFromFile(string path)
         {
             if (string.IsNullOrWhiteSpace(path))
@@ -30,6 +31,7 @@ namespace webapi
                 throw new FileEmptyException($"File at path {path} is empty."); 
             }
 
+            _sourceFile = path;
             LoadFromJson(fileContents);
         }
 
@@ -53,6 +55,23 @@ namespace webapi
             _loadedKeys = jsonKeys;
         }
 
+        public void SaveToFile()
+        {
+            if (string.IsNullOrWhiteSpace(_sourceFile))
+            {
+                throw new Exception("Not loaded from file.");
+            }
+
+            if (!File.Exists(_sourceFile))
+            {
+                throw new FileNotFoundException("Source file no longer exists.");
+            }
+
+            string json = JsonConvert.SerializeObject(_loadedKeys, Formatting.Indented);
+            File.WriteAllText(_sourceFile,json);
+
+        }
+        
         public string GetKeyForNode(string nodeId)
         {
             string key = _loadedKeys.FirstOrDefault(x => x.NodeId == nodeId)?.PublicKey;
@@ -62,6 +81,28 @@ namespace webapi
             }
 
             return key;
+        }
+
+        public void AddKey(string nodeId, string pubkeyAsBase64)
+        {
+            _loadedKeys.Add(new JsonPublicNodeKey
+            {
+                NodeId = nodeId,
+                PublicKey = pubkeyAsBase64
+            });
+            SaveToFile();
+        }
+
+        public void RemoveKey(string nodeId)
+        {
+            var key = _loadedKeys.FirstOrDefault(x => x.NodeId == nodeId);
+            if (key == null)
+            {
+                throw new KeyNotFoundException("Node key is not known");
+            }
+
+            _loadedKeys.Remove(key);
+            SaveToFile();
         }
 
         public static IPublickeySource FromFile(string keyfileJson)

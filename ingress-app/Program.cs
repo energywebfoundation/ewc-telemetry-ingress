@@ -4,6 +4,7 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Microsoft.Extensions.Configuration;
 
 namespace webapi
@@ -12,7 +13,6 @@ namespace webapi
     {
         public static void Main(string[] args)
         {
-            
             // build config
             string envName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             IConfigurationRoot config = new ConfigurationBuilder()
@@ -21,9 +21,26 @@ namespace webapi
                 .AddJsonFile($"appsettings.{envName}.json", true)
                 .AddEnvironmentVariables("TELEMETRY_")
                 .AddInfluxConfigFromEnvironment()
+                .AddCommandLine(args)
                 .Build();
+
+
+            // If we run a key management function we don't go into daemon mode
+            string keyCommandMode = config.GetValue<string>("keycmd", String.Empty);
+            if (!String.IsNullOrWhiteSpace(keyCommandMode))
+            {
+                // TODO: Keystore not taken from singleton as this happens later on
+                var keystore = JsonPublicKeySource.FromFile(
+                    Path.Combine(config.GetValue<string>("EXTERNAL_DIR", "./"), "keyfile.json"));
+                
+                var keymgr = new KeyManagement(config,keystore);
+                keymgr.ProcessKeyCommand(keyCommandMode);
+                return;
+            }
+            
             
             // print config
+            // TODO: remove after done
             foreach (var c in config.AsEnumerable())
             {
                 Console.WriteLine($"{c.Key} ==> {c.Value}");
@@ -56,5 +73,6 @@ namespace webapi
 
             host.Run();
         }
+       
     }
 }
