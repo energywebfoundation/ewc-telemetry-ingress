@@ -60,26 +60,43 @@ namespace webapi.Controllers
             }
 
             var stringContent = new StringContent(
-                string.Join(System.Environment.NewLine, content), 
+                string.Join(Environment.NewLine, content), 
                 Encoding.UTF8, 
                 "application/json");
 
-            HttpResponseMessage response = await Post(_requestUri, stringContent, cancellationToken);
-
-
-            string httpStatusCode = ((int)response.StatusCode).ToString();
-
-            if (response.IsSuccessStatusCode)
+            HttpResponseMessage response = null;
+            try
             {
+                response = await Post(_requestUri, stringContent, cancellationToken);
+
+
+                string httpStatusCode = ((int)response.StatusCode).ToString();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new WebException("Got " + httpStatusCode + " from database, " +
+                                           response.Content.ReadAsStringAsync().Result);
+                }
+
                 LastInsertCount=content.Count;
                 return httpStatusCode;
+
+            }
+            catch (Exception e)
+            {
+                string errorMessage = "Unable to insert into database";
+                if (response != null)
+                {
+                    errorMessage += await response.Content.ReadAsStringAsync();    
+                }
+                
+                //What to to in case of influx connection error, should reschedual items in queue?
+                Enqueue(content);
+
+                Console.WriteLine("ERROR: " + errorMessage);
             }
 
-            string errorMessage = await response.Content.ReadAsStringAsync();
-            //What to to in case of influx connection error, should reschedual items in queue?
-            Enqueue(content);
-
-            return httpStatusCode;
+            return "error";
 
         }
 

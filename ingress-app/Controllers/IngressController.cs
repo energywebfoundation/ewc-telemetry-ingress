@@ -43,8 +43,8 @@ namespace webapi.Controllers
             }
             catch (KeyNotFoundException)
             {
-                Console.WriteLine("node unknown");
-                return  Unauthorized();
+                Console.WriteLine($"Node Unknown: {telemetryPackage.NodeId}");
+                return Unauthorized();
             }
 
             // Verify Signature
@@ -53,21 +53,21 @@ namespace webapi.Controllers
 
             if (!signatureValid)
             {
-                Console.WriteLine("bad signature");
+                Console.WriteLine($"Bad signature from node: {telemetryPackage.NodeId}");
                 return Unauthorized();
             }
 
             try
             {
 
-                Console.WriteLine("Accepted telemetry: " + telemetryPackage.Signature);
+                Console.WriteLine($"Accepted telemetry from {telemetryPackage.NodeId} [{telemetryPackage.Payload.Count} metrics]");
                 // Signature valid - record to db
-                //await Task.Run(() => _influx.Enqueue(telemetryPackage.Payload));
-
+                _influx.Enqueue(telemetryPackage.Payload);
             }
             catch (Exception ex)
             {
-               return BadRequest(ex.ToString());
+                Console.WriteLine("ERROR: unable to enqueue: " + ex);
+               return BadRequest("Unable to process telemetry");
             }
 
             return Accepted();
