@@ -20,20 +20,20 @@ namespace tests
     {
         public static LineProtocolConnectionParameters InitConfiguration()
         {
-            bool from_file = false;
-            LineProtocolConnectionParameters conf_fileobj = null;
+            bool fromFile = true;
+            LineProtocolConnectionParameters confFileobj = null;
 
-            if (from_file)
+            if (fromFile)
             {
                 ConfigurationBuilder cb = new ConfigurationBuilder();
                 cb.SetBasePath(System.AppContext.BaseDirectory);
                 cb.AddJsonFile("appsettings.test.json");
                 IConfigurationRoot cr = cb.Build();
-                conf_fileobj = cr.GetSection("Influx").Get<LineProtocolConnectionParameters>();
+                confFileobj = cr.GetSection("Influx").Get<LineProtocolConnectionParameters>();
 
             }else{
 
-                conf_fileobj = new LineProtocolConnectionParameters() { 
+                confFileobj = new LineProtocolConnectionParameters() { 
                     Address = new Uri("http://influxdb:8086"), 
                     DBName = "testdb", 
                     User = "root", 
@@ -43,7 +43,7 @@ namespace tests
                     UseGzipCompression = true };
             }
 
-            return conf_fileobj;
+            return confFileobj;
         }
 
         public static string InfluxCon(LineProtocolConnectionParameters conobj)
@@ -59,12 +59,12 @@ namespace tests
         {
 
             var conobj = InitConfiguration();
-            var InfluxLib = new InfluxClient(conobj);
+            var influxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
 
             keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
 
-            IngressController tc = new IngressController(keystore, InfluxLib);
+            IngressController tc = new IngressController(keystore, influxLib);
             ActionResult webResponse = await tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = "node-1",
@@ -81,7 +81,7 @@ namespace tests
             Assert.Equal((int)HttpStatusCode.Accepted, result.StatusCode);
            
             System.Threading.Thread.Sleep(8000); //wait for Queue to flush
-            Assert.Equal(2, InfluxLib.LastInsertCount);
+            Assert.Equal(2, influxLib.LastInsertCount);
 
             /*JObject pobj = JObject.Parse(InfluxCon(conobj));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
@@ -95,12 +95,12 @@ namespace tests
         {
 
             var conobj = InitConfiguration();
-            var InfluxLib = new InfluxClient(conobj);
+            var influxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
             keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
 
 
-            IngressController tc = new IngressController(keystore, InfluxLib);
+            IngressController tc = new IngressController(keystore, influxLib);
             ActionResult webResponse = await tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = "node-1",
@@ -115,7 +115,7 @@ namespace tests
             Assert.NotNull(webResponse);
             var result = Assert.IsType<StatusCodeResult>(webResponse);
             Assert.Equal((int)HttpStatusCode.Forbidden, result.StatusCode);
-            Assert.Equal(0, InfluxLib.LastInsertCount);
+            Assert.Equal(0, influxLib.LastInsertCount);
             /* JObject pobj = JObject.Parse(InfluxCon(conobj));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
             var in_count = rows.Children().Count();
@@ -127,13 +127,13 @@ namespace tests
         public async void NullTelemetryShouldNotRecord()
         {
             var conobj = InitConfiguration();
-            var InfluxLib = new InfluxClient(conobj);
+            var influxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
 
             keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
 
 
-            IngressController tc = new IngressController(keystore, InfluxLib);
+            IngressController tc = new IngressController(keystore, influxLib);
             ActionResult webResponse = await tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = null,
@@ -145,7 +145,7 @@ namespace tests
             Assert.NotNull(webResponse);
             var result = Assert.IsType<BadRequestResult>(webResponse);
             Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.Equal(0, InfluxLib.LastInsertCount);
+            Assert.Equal(0, influxLib.LastInsertCount);
             /* JObject pobj = JObject.Parse(InfluxCon(conobj));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
             var in_count = rows.Children().Count();
@@ -157,12 +157,12 @@ namespace tests
         public async void EmptyTelemetryShouldNotRecord()
         {
             var conobj = InitConfiguration();
-            var InfluxLib = new InfluxClient(conobj);
+            var influxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
             keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
 
 
-            IngressController tc = new IngressController(keystore, InfluxLib);
+            IngressController tc = new IngressController(keystore, influxLib);
             ActionResult webResponse = await tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = "",
@@ -174,7 +174,7 @@ namespace tests
             Assert.NotNull(webResponse);
             var result = Assert.IsType<BadRequestResult>(webResponse);
             Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.Equal(0, InfluxLib.LastInsertCount);
+            Assert.Equal(0, influxLib.LastInsertCount);
             /* JObject pobj = JObject.Parse(InfluxCon(conobj));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
             var in_count = rows.Children().Count();

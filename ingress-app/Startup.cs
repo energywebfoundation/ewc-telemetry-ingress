@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,10 @@ namespace webapi
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddSingleton<IPublickeySource>(serviceProvider => JsonPublicKeySource.FromFile("keyfile.json"));
+            services.AddSingleton<IPublickeySource>(serviceProvider => 
+                JsonPublicKeySource.FromFile(
+                Path.Combine(Configuration.GetValue<string>("EXTERNAL_DIR","./"), "keyfile.json"))
+            );
 
 
             services.AddSingleton <IInfluxClient, InfluxClient>(serviceProvider =>

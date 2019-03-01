@@ -31,6 +31,7 @@ namespace webapi.Controllers
                 telemetryPackage.Payload == null ||
                 telemetryPackage.Payload.Count == 0)
             {
+                Console.WriteLine("bad request");
                 return BadRequest();
             }
 
@@ -42,6 +43,7 @@ namespace webapi.Controllers
             }
             catch (KeyNotFoundException)
             {
+                Console.WriteLine($"Node Unknown: {telemetryPackage.NodeId}");
                 return StatusCode(403);
             }
 
@@ -51,21 +53,23 @@ namespace webapi.Controllers
 
             if (!signatureValid)
             {
+                Console.WriteLine($"Bad signature from node: {telemetryPackage.NodeId}");
                 return StatusCode(403);
             }
 
             try
             {
-  
-                // Signature valid - record to db
-                await Task.Run(() => _influx.Enqueue(telemetryPackage.Payload));
 
+                Console.WriteLine($"Accepted telemetry from {telemetryPackage.NodeId} [{telemetryPackage.Payload.Count} metrics]");
+                // Signature valid - record to db
+                _influx.Enqueue(telemetryPackage.Payload);
             }
             catch (Exception ex)
             {
                 //return BadRequest(ex.ToString());
                 //TODO Logging error instead of sending back to client
-                return StatusCode(400);
+                Console.WriteLine("ERROR: unable to enqueue: " + ex);
+               return StatusCode(400);
             }
 
             return Accepted();

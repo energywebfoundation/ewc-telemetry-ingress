@@ -26,5 +26,10 @@ namespace tests
         {
             _keys.Add(node,pubKey);
         }
+
+        public void RemoveKey(string nodeId)
+        {
+            _keys.Remove(nodeId);
+        }
     }
 }
