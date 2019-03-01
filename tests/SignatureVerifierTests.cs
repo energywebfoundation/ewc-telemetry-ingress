@@ -20,7 +20,7 @@ namespace tests
     {
         public static LineProtocolConnectionParameters InitConfiguration()
         {
-            bool fromFile = true;
+            bool fromFile = false;
             LineProtocolConnectionParameters confFileobj = null;
 
             if (fromFile)
@@ -35,7 +35,7 @@ namespace tests
 
                 confFileobj = new LineProtocolConnectionParameters() { 
                     Address = new Uri("http://influxdb:8086"), 
-                    DBName = "testdb", 
+                    DBName = "telemetry", 
                     User = "root", 
                     Password = "root", 
                     FlushBufferItemsSize = 2, 
