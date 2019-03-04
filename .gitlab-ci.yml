@@ -10,7 +10,7 @@ build-dotnet:
   image: microsoft/dotnet:2.2-sdk
   script:
     - dotnet restore
-    - dotnet publish -c Release -o build
+    - dotnet publish -c Debug -o build
   artifacts:
     untracked: false
     paths:

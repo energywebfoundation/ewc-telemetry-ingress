@@ -67,7 +67,7 @@ namespace webapi.Controllers
             HttpResponseMessage response = null;
             try
             {
-                response = await Post(_requestUri, stringContent, cancellationToken);
+                response = await _httpClient.PostAsync(_requestUri, stringContent, cancellationToken);
 
 
                 string httpStatusCode = ((int)response.StatusCode).ToString();
@@ -98,11 +98,6 @@ namespace webapi.Controllers
 
             return "error";
 
-        }
-
-        private Task<HttpResponseMessage> Post (string endpoint, HttpContent httpContent, CancellationToken cToken) 
-        {
-            return  _httpClient.PostAsync(endpoint, httpContent, cToken);
         }
 
         public void Enqueue(IList<string> pointsList)
