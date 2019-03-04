@@ -60,7 +60,7 @@ namespace webapi
                 return;
             }
 
-            IWebHost host = WebHost.CreateDefaultBuilder(args)
+            IWebHost host = new WebHostBuilder()
                 .UseConfiguration(config)
                 .UseStartup<Startup>()
                 .UseKestrel(options =>
