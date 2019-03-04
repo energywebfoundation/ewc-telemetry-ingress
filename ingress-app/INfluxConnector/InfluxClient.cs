@@ -84,7 +84,7 @@ namespace webapi.Controllers
             }
             catch (Exception e)
             {
-                string errorMessage = "Unable to insert into database";
+                string errorMessage = $"Unable to insert into database: {e.Message}";
                 if (response != null)
                 {
                     errorMessage += await response.Content.ReadAsStringAsync();    
