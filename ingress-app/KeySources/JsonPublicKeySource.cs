@@ -74,7 +74,7 @@ namespace webapi
         
         public string GetKeyForNode(string nodeId)
         {
-            string key = (_loadedKeys.Where(x=> x.NodeId == nodeId)).FirstOrDefault().PublicKey;
+            string key = (_loadedKeys.Where(x=> x.NodeId == nodeId)).FirstOrDefault()?.PublicKey;
             if (key == null)
             {
                 throw new KeyNotFoundException("Public key not available");
