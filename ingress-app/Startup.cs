@@ -25,7 +25,7 @@ namespace webapi
 
             services.AddSingleton<IPublickeySource>(serviceProvider => 
                 JsonPublicKeySource.FromFile(
-                Path.Combine(Configuration.GetValue<string>("EXTERNAL_DIR","./"), "keyfile.json"))
+                Path.Combine(Configuration.GetValue<string>("INTERNAL_DIR","./"), "keyfile.json"))
             );
 
 
