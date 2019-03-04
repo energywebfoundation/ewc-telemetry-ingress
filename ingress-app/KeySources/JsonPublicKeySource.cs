@@ -12,16 +12,22 @@ namespace webapi
         private List<JsonPublicNodeKey> _loadedKeys;
         private string _sourceFile;
         
-        public void LoadFromFile(string path)
+        public void LoadFromFile(string path, bool createIfEmpty = false)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentNullException(nameof(path),"path can't be null or empty");
             }
 
-            if (!File.Exists(path))
+            if (!createIfEmpty && !File.Exists(path))
             {
                 throw new ArgumentException(nameof(path),"No file at path: " + path);
+            } 
+            
+            if (createIfEmpty && !File.Exists(path))
+            {
+                // Create empty keyfile
+                File.WriteAllText(path,"[]");
             }
             
             // Read the file from disk
@@ -32,10 +38,10 @@ namespace webapi
             }
 
             _sourceFile = path;
-            LoadFromJson(fileContents);
+            LoadFromJson(fileContents, createIfEmpty);
         }
 
-        public void LoadFromJson(string json)
+        public void LoadFromJson(string json, bool emptyOk = false)
         {
             List<JsonPublicNodeKey> jsonKeys = null;
             try
@@ -47,7 +53,7 @@ namespace webapi
                 throw new KeyLoadException($"Unable to load keys from json",ex); 
             }
 
-            if (jsonKeys.Count == 0)
+            if (!emptyOk && jsonKeys.Count == 0)
             {
                 throw new KeyLoadException($"JSON contains no keys");
             }
