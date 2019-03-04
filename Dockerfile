@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:2.2-aspnetcore-sdk
+FROM microsoft/dotnet:2.2-aspnetcore-runtime
 
 WORKDIR /app
 ADD ingress-app/build .
