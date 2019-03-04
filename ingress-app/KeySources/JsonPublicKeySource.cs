@@ -111,10 +111,10 @@ namespace webapi
             SaveToFile();
         }
 
-        public static IPublickeySource FromFile(string keyfileJson)
+        public static IPublickeySource FromFile(string keyfileJson, bool createIfEmpty = false)
         {
             JsonPublicKeySource source = new JsonPublicKeySource();
-            source.LoadFromFile(keyfileJson);
+            source.LoadFromFile(keyfileJson,createIfEmpty);
             return source;
         }
     }

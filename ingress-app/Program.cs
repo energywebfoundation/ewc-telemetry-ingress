@@ -31,7 +31,7 @@ namespace webapi
             {
                 // TODO: Keystore not taken from singleton as this happens later on
                 var keystore = JsonPublicKeySource.FromFile(
-                    Path.Combine(config.GetValue<string>("INTERNAL_DIR", "./"), "keyfile.json"));
+                    Path.Combine(config.GetValue<string>("INTERNAL_DIR", "./"), "keyfile.json"), true);
                 
                 var keymgr = new KeyManagement(config,keystore);
                 keymgr.ProcessKeyCommand(keyCommandMode);
