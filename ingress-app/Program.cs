@@ -31,7 +31,7 @@ namespace webapi
             {
                 // TODO: Keystore not taken from singleton as this happens later on
                 var keystore = JsonPublicKeySource.FromFile(
-                    Path.Combine(config.GetValue<string>("EXTERNAL_DIR", "./"), "keyfile.json"));
+                    Path.Combine(config.GetValue<string>("INTERNAL_DIR", "./"), "keyfile.json"));
                 
                 var keymgr = new KeyManagement(config,keystore);
                 keymgr.ProcessKeyCommand(keyCommandMode);
@@ -45,7 +45,7 @@ namespace webapi
             {
                 Console.WriteLine($"{c.Key} ==> {c.Value}");
             }
-            
+
             string certificatePath = Path.Combine(config.GetValue("INTERNAL_DIR","./"),"telemetry-ingress.pfx");
             if (!File.Exists(certificatePath))
             {
