@@ -16,6 +16,10 @@ namespace webapi
 
         public int FlushBufferSeconds {get; set;}
 
+        public int FlushSecondBufferItemsSize {get; set;}
+
+        public int FlushSecondBufferSeconds {get; set;}
+
         public bool UseGzipCompression { get; set; }
     }
 }

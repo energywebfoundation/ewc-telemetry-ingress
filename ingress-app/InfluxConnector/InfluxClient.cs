@@ -24,6 +24,8 @@ namespace webapi.Controllers
     {
         private readonly ISubject<string> _synSubject;
         private readonly IDisposable _subscription;
+        private readonly ISubject<string> _synSubjectSecondQueue;
+        private readonly IDisposable _subscriptionSecondQueue;
         private readonly HttpClientHandler _httpClientHandler;
         private readonly HttpClient _httpClient;
         private readonly string _requestUri;
@@ -49,10 +51,18 @@ namespace webapi.Controllers
 
             _subscription = _synSubject
                 .Buffer(TimeSpan.FromSeconds(paramsObj.FlushBufferSeconds), paramsObj.FlushBufferItemsSize)
-                .Subscribe(onNext: async (pointsList) => await SendToInflux(pointsList));
+                .Subscribe(onNext: async (pointsList) => await SendToInflux(pointsList,true));
+
+            //second buffer in case first fails
+            Subject<string> subjectSecondQueue = new Subject<string>();
+            _synSubjectSecondQueue = Subject.Synchronize(subjectSecondQueue);
+
+            _subscriptionSecondQueue = _synSubjectSecondQueue
+                .Buffer(TimeSpan.FromSeconds(paramsObj.FlushSecondBufferSeconds), paramsObj.FlushSecondBufferItemsSize)
+                .Subscribe(onNext: async (pointsListSecondQueue) => await SendToInflux(pointsListSecondQueue, false));
         }
 
-        private async Task<string> SendToInflux(IList<string> content, CancellationToken cancellationToken = default(CancellationToken))
+        private async Task<string> SendToInflux(IList<string> content,bool workerQueue, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (content == null || content.Count == 0)
             {
@@ -63,6 +73,7 @@ namespace webapi.Controllers
                 string.Join(Environment.NewLine, content), 
                 Encoding.UTF8, 
                 "application/json");
+            Console.WriteLine((workerQueue?"Worker ":"Failure Handler ")+"Buffer flush call");
 
             HttpResponseMessage response = null;
             try
@@ -90,8 +101,12 @@ namespace webapi.Controllers
                     errorMessage += await response.Content.ReadAsStringAsync();    
                 }
                 
-                //What to to in case of influx connection error, should reschedual items in queue?
-                Enqueue(content);
+                //In case of failure worker queue data will be placed in failure handler queue
+                if(workerQueue){
+                    Enqueue(content,!workerQueue);
+                }else{
+                    // TODO What to do when failure handler queue fails
+                }
 
                 Console.WriteLine("ERROR: " + errorMessage);
             }
@@ -100,11 +115,12 @@ namespace webapi.Controllers
 
         }
 
-        public void Enqueue(IList<string> pointsList)
+        public void Enqueue(IList<string> pointsList, bool workerQueue)
         {
+            ISubject<string>  sub = workerQueue?_synSubject : _synSubjectSecondQueue;
             foreach (var point in pointsList)
             {
-                _synSubject.OnNext(point);
+                sub.OnNext(point);
             }
         }
 
@@ -117,6 +133,7 @@ namespace webapi.Controllers
                     _httpClient?.Dispose();
                     _httpClientHandler?.Dispose();
                     _subscription?.Dispose();
+                    _subscriptionSecondQueue?.Dispose();
                     
                 }
 

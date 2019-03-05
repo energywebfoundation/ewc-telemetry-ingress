@@ -38,8 +38,10 @@ namespace tests
                     DBName = "telemetry", 
                     User = "root", 
                     Password = "root", 
-                    FlushBufferItemsSize = 2, 
-                    FlushBufferSeconds = 3, 
+                    FlushBufferItemsSize = 4, 
+                    FlushBufferSeconds = 2, 
+                    FlushSecondBufferItemsSize = 1000, 
+                    FlushSecondBufferSeconds = 30, 
                     UseGzipCompression = true };
             }
 
