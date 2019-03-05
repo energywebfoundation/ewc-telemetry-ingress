@@ -130,9 +130,8 @@ namespace webapi.Controllers
                         realTimePackage.Payload.BlockHash,
                         realTimePackage.Payload.BlockTS);
                 // Signature valid - record to db
-                List<string> pointList = new List<string>();
-                pointList.Add(influxPoint);
-                _influx.Enqueue(pointList , true);
+                
+                _influx.Enqueue(influxPoint , true);
             }
             catch (Exception ex)
             {

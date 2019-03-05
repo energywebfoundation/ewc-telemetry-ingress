@@ -125,6 +125,14 @@ namespace webapi.Controllers
             }
         }
 
+
+        public void Enqueue(string point, bool workerQueue)
+        {
+            ISubject<string>  sub = workerQueue?_synSubject : _synSubjectSecondQueue;
+            if(InfluxPointVerifier.verifyPoint(point))
+                    sub.OnNext(point);
+        }
+
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposedValue)
