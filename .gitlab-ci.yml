@@ -24,7 +24,7 @@ test-dotnet:
   services:
     - influxdb
   script:
-    - curl -i -XPOST http://influxdb:8086/query --data-urlencode "q=CREATE DATABASE testdb"
+    - curl -i -XPOST http://influxdb:8086/query --data-urlencode "q=CREATE DATABASE telemetry"
     - dotnet restore
     - dotnet build
     - dotnet test
