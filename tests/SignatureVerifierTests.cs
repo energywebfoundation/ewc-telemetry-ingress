@@ -35,7 +35,7 @@ namespace tests
 
                 confFileobj = new LineProtocolConnectionParameters() { 
                     Address = new Uri("http://influxdb:8086"), 
-                    DBName = "testdb", 
+                    DBName = "telemetry", 
                     User = "root", 
                     Password = "root", 
                     FlushBufferItemsSize = 2, 
@@ -75,8 +75,10 @@ namespace tests
                     "weather,location=us-east temperature=75 1465839830100400200"
                 }
             });
-
-            Assert.IsType<AcceptedResult>(webResponse);
+            
+            Assert.NotNull(webResponse);
+            var result = Assert.IsType<AcceptedResult>(webResponse);
+            Assert.Equal((int)HttpStatusCode.Accepted, result.StatusCode);
            
             System.Threading.Thread.Sleep(8000); //wait for Queue to flush
             Assert.Equal(2, influxLib.LastInsertCount);
@@ -87,7 +89,7 @@ namespace tests
             Assert.Equal(2, in_count);//Check if row count is now 2
             */
         }
-
+ 
         [Fact]
         public async void InvalidSignatureShouldNotRecordAsync()
         {
@@ -109,7 +111,10 @@ namespace tests
                 }
             });
 
-            Assert.IsType<UnauthorizedResult>(webResponse);
+            //Assert.IsType<ForbidResult>(webResponse);
+            Assert.NotNull(webResponse);
+            var result = Assert.IsType<StatusCodeResult>(webResponse);
+            Assert.Equal((int)HttpStatusCode.Forbidden, result.StatusCode);
             Assert.Equal(0, influxLib.LastInsertCount);
             /* JObject pobj = JObject.Parse(InfluxCon(conobj));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
@@ -136,7 +141,10 @@ namespace tests
                 Payload = null
             });
 
-            Assert.IsType<BadRequestResult>(webResponse);
+            //Assert.IsType<BadRequestResult>(webResponse);
+            Assert.NotNull(webResponse);
+            var result = Assert.IsType<BadRequestResult>(webResponse);
+            Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
             Assert.Equal(0, influxLib.LastInsertCount);
             /* JObject pobj = JObject.Parse(InfluxCon(conobj));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
@@ -162,7 +170,10 @@ namespace tests
                 Payload = new List<string>()
             });
 
-            Assert.IsType<BadRequestResult>(webResponse);
+            //Assert.IsType<BadRequestResult>(webResponse);
+            Assert.NotNull(webResponse);
+            var result = Assert.IsType<BadRequestResult>(webResponse);
+            Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
             Assert.Equal(0, influxLib.LastInsertCount);
             /* JObject pobj = JObject.Parse(InfluxCon(conobj));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");

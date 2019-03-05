@@ -44,7 +44,7 @@ namespace webapi.Controllers
             catch (KeyNotFoundException)
             {
                 Console.WriteLine($"Node Unknown: {telemetryPackage.NodeId}");
-                return Unauthorized();
+                return StatusCode(403);
             }
 
             // Verify Signature
@@ -54,7 +54,7 @@ namespace webapi.Controllers
             if (!signatureValid)
             {
                 Console.WriteLine($"Bad signature from node: {telemetryPackage.NodeId}");
-                return Unauthorized();
+                return StatusCode(403);
             }
 
             try
@@ -66,8 +66,10 @@ namespace webapi.Controllers
             }
             catch (Exception ex)
             {
+                //return BadRequest(ex.ToString());
+                //TODO Logging error instead of sending back to client
                 Console.WriteLine("ERROR: unable to enqueue: " + ex);
-               return BadRequest("Unable to process telemetry");
+               return StatusCode(400);
             }
 
             return Accepted();
