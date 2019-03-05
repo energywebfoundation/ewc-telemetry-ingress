@@ -46,7 +46,8 @@ namespace webapi
                 Console.WriteLine($"{c.Key} ==> {c.Value}");
             }
 
-            string certificatePath = Path.Combine(config.GetValue("INTERNAL_DIR","./"),"telemetry-ingress.pfx");
+            string certificatePath = Path.GetFullPath(Path.Combine(config.GetValue("INTERNAL_DIR","./"),"telemetry-ingress.pfx"));
+            
             if (!File.Exists(certificatePath))
             {
                 Console.WriteLine($"Error: Unable to read certificate from {certificatePath}. File not found");
