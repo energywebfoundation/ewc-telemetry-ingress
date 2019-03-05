@@ -1,10 +1,10 @@
 using System;
 
-namespace ingress_app.InfluxConnector
+namespace  webapi.Controllers
 {
     public class InfluxPointVerifier
     {
-        public static bool verifyPoint(string point, bool verbose)
+        public static bool verifyPoint(string point)
         {
             string[] tokens = point.Split(' ');
 

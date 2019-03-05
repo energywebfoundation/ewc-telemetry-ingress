@@ -120,7 +120,8 @@ namespace webapi.Controllers
             ISubject<string>  sub = workerQueue?_synSubject : _synSubjectSecondQueue;
             foreach (var point in pointsList)
             {
-                sub.OnNext(point);
+                if(InfluxPointVerifier.verifyPoint(point))
+                    sub.OnNext(point);
             }
         }
 
