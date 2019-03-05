@@ -8,7 +8,7 @@ namespace webapi.Controllers
     public interface IInfluxClient : IDisposable
     {
          //Task WriteToInflux(IList<string> pointsList);
-         void Enqueue(IList<string> poin, bool workerQueue);
+         void Enqueue(IList<string> point, bool workerQueue);
         
     }
 }

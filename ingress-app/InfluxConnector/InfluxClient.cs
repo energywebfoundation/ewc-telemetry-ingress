@@ -73,7 +73,7 @@ namespace webapi.Controllers
                 string.Join(Environment.NewLine, content), 
                 Encoding.UTF8, 
                 "application/json");
-            Console.WriteLine((workerQueue?"Worker ":"Failure Handler ")+"Buffer flush call");
+            Console.WriteLine("{0} Buffer flush call", (workerQueue?"Worker ":"Failure Handler "));
 
             HttpResponseMessage response = null;
             try
@@ -108,7 +108,7 @@ namespace webapi.Controllers
                     // TODO What to do when failure handler queue fails
                 }
 
-                Console.WriteLine("ERROR: " + errorMessage);
+                Console.WriteLine("ERROR: {0}" , errorMessage);
             }
 
             return "error";
