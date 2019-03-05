@@ -62,7 +62,7 @@ namespace webapi.Controllers
 
                 Console.WriteLine($"Accepted telemetry from {telemetryPackage.NodeId} [{telemetryPackage.Payload.Count} metrics]");
                 // Signature valid - record to db
-                _influx.Enqueue(telemetryPackage.Payload);
+                _influx.Enqueue(telemetryPackage.Payload , true);
             }
             catch (Exception ex)
             {
