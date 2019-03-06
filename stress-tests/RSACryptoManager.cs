@@ -47,5 +47,22 @@ namespace stresstests
                 return "";
             }
         }
+
+         public bool VerifySignedData(string payload, string signature){
+            try
+            {
+                ASCIIEncoding byteConverter = new ASCIIEncoding();
+                byte[] payloadBytes = byteConverter.GetBytes(payload);
+                byte[] signatureBytes = Convert.FromBase64String(signature);
+                return RSAalg.VerifyData(payloadBytes, new SHA256CryptoServiceProvider(), signatureBytes); 
+
+            }
+            catch(CryptographicException e)
+            {
+                Console.WriteLine(e.Message);
+
+                return false;
+            }
+        }
     }
 }
