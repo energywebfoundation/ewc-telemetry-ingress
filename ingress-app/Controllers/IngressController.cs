@@ -25,7 +25,7 @@ namespace webapi.Controllers
 
         // POST api/values
         [HttpPost("influx")]
-        public async Task<ActionResult> PostInfluxTelemetry([FromBody] InfluxTelemetry telemetryPackage)
+        public ActionResult PostInfluxTelemetry([FromBody] InfluxTelemetry telemetryPackage)
         {
             // verify
             if (telemetryPackage?.NodeId == null ||
@@ -77,8 +77,8 @@ namespace webapi.Controllers
             return Accepted();
         }
 
-         [HttpPost("influx")]
-        public async Task<ActionResult> PostRealTimeTelemetry([FromBody] RealTimeTelemetry realTimePackage)
+         [HttpPost("realtime")]
+        public ActionResult PostRealTimeTelemetry([FromBody] RealTimeTelemetry realTimePackage)
         {
             // verify
             if (realTimePackage?.NodeId == null ||
@@ -89,7 +89,8 @@ namespace webapi.Controllers
                 string.IsNullOrWhiteSpace(realTimePackage.Payload.BlockHash) ||
                 realTimePackage.Payload?.BlockTS==null || realTimePackage.Payload?.BlockTS<=0 ||
                 realTimePackage.Payload?.BlockReceived==null || realTimePackage.Payload?.BlockReceived<=0 ||
-                realTimePackage.Payload?.NumPeers==null || realTimePackage.Payload?.NumPeers<0 
+                realTimePackage.Payload?.NumPeers==null || realTimePackage.Payload?.NumPeers<0 ||
+                realTimePackage.Payload?.NumTxInBlock==null || realTimePackage.Payload?.NumTxInBlock<0
                 )
             {
                 Console.WriteLine("bad request");
@@ -120,15 +121,18 @@ namespace webapi.Controllers
 
             try
             {
+                //Point format |measurement|,tag_set| |field_set| |timestamp|
 
                 Console.WriteLine($"Accepted telemetry from {realTimePackage.NodeId} ]");
-                string influxPoint = string.Format("{0},numpeers={1},blockreceived={2} blocknum={3},blockhash={4} {5}",
+                string influxPoint = string.Format("parity,nodeid={0},client={1} blocknum={2},numpeers={3},blockts={4},numtxinblock={4},propagationtime={5} {6}",
+                        realTimePackage.NodeId,
                         realTimePackage.Payload.Client,
-                        realTimePackage.Payload.NumPeers,
-                        realTimePackage.Payload.BlockReceived,
                         realTimePackage.Payload.BlockNum,
-                        realTimePackage.Payload.BlockHash,
-                        realTimePackage.Payload.BlockTS);
+                        realTimePackage.Payload.NumPeers,
+                        realTimePackage.Payload.BlockTS,
+                        realTimePackage.Payload.NumTxInBlock,
+                        (realTimePackage.Payload.BlockReceived - realTimePackage.Payload.BlockTS),
+                        realTimePackage.Payload.BlockReceived);
                 // Signature valid - record to db
                 
                 _influx.Enqueue(influxPoint , true);

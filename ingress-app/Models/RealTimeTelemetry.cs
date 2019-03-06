@@ -33,5 +33,8 @@ namespace webapi
 
         [JsonProperty("numpeers")]
         public ushort NumPeers { get; set; }
+
+        [JsonProperty("numtxinblock")]
+        public ushort NumTxInBlock { get; set; }
     }
 }
