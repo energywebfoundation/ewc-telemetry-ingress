@@ -124,7 +124,7 @@ namespace webapi.Controllers
                 //Point format |measurement|,tag_set| |field_set| |timestamp|
 
                 Console.WriteLine($"Accepted telemetry from {realTimePackage.NodeId} ]");
-                string influxPoint = string.Format("parity,nodeid={0},client={1} blocknum={2},numpeers={3},blockts={4},numtxinblock={4},propagationtime={5} {6}",
+                string influxPoint = string.Format("parity,nodeid={0},client={1} blocknum={2},numpeers={3},blockts={4},numtxinblock={5},propagationtime={6} {7}",
                         realTimePackage.NodeId,
                         realTimePackage.Payload.Client,
                         realTimePackage.Payload.BlockNum,
