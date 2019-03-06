@@ -57,7 +57,7 @@ namespace tests
         }
 
         [Fact]
-        public async void ValidMetricsShouldRecordAsync()
+        public void ValidMetricsShouldRecordAsync()
         {
 
             var conobj = InitConfiguration();
@@ -67,7 +67,7 @@ namespace tests
             keystore.AddKey("node-1", "BgIAAACkAABSU0ExAAQAAAEAAQBdUkRrF0SA3a+QtGv6y97DFa79Z/IDHtCHehoj/LADUJxXsI1k6GBqdyE7MkF9uX2j8FbAMlxpmIKrMcRTWj9wZ5gIhbntiCF61IFsQJ5af23WsTg82u9A7mepxSXrfgfu6Bzq1nB+pUGeWlATaLiOT+wm5uCYjYH8MiTMfDLu4g==");
 
             IngressController tc = new IngressController(keystore, influxLib);
-            ActionResult webResponse = await tc.PostInfluxTelemetry(new InfluxTelemetry
+            ActionResult webResponse = tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = "node-1",
                 Signature = "GT+8qiTNx2X2jtE0YQOBH6EE6Pu+a6DUFMK//LU+wiIwp/OPvaO7h2SDlU40/MAt83R4ZzVT2IBrl37phKUhbiBN0sMmvgxGJdJAOkAjKtgtacqUUxuVGim4PE6pAIAEIRoETQMe7ZlsALcoyA1p5M8Y1481bM1ykNcKQ23QPuM=",
@@ -93,7 +93,7 @@ namespace tests
         }
  
         [Fact]
-        public async void InvalidSignatureShouldNotRecordAsync()
+        public void InvalidSignatureShouldNotRecordAsync()
         {
 
             var conobj = InitConfiguration();
@@ -103,7 +103,7 @@ namespace tests
 
 
             IngressController tc = new IngressController(keystore, influxLib);
-            ActionResult webResponse = await tc.PostInfluxTelemetry(new InfluxTelemetry
+            ActionResult webResponse = tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = "node-1",
                 Signature = "GT+8qiTNx2X2jtE0YQOBH6EE6Pu+a6DUFMK//LU+wiIwp/OPvaO7h2SDlU40/MAt83R4ZzVT2IBrl37phKUhbiBN0sMmvgxGJdJAOkAjKtgtacqUUxuVGim4PE6pAIAEIRoETQMe7ZlsALcoyA1p5M8Y1481bM1ykNcKQ23QPuM=",
@@ -126,7 +126,7 @@ namespace tests
         }
 
         [Fact]
-        public async void NullTelemetryShouldNotRecord()
+        public void NullTelemetryShouldNotRecord()
         {
             var conobj = InitConfiguration();
             var influxLib = new InfluxClient(conobj);
@@ -136,7 +136,7 @@ namespace tests
 
 
             IngressController tc = new IngressController(keystore, influxLib);
-            ActionResult webResponse = await tc.PostInfluxTelemetry(new InfluxTelemetry
+            ActionResult webResponse = tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = null,
                 Signature = null,
@@ -156,7 +156,7 @@ namespace tests
         }
 
         [Fact]
-        public async void EmptyTelemetryShouldNotRecord()
+        public void EmptyTelemetryShouldNotRecord()
         {
             var conobj = InitConfiguration();
             var influxLib = new InfluxClient(conobj);
@@ -165,7 +165,7 @@ namespace tests
 
 
             IngressController tc = new IngressController(keystore, influxLib);
-            ActionResult webResponse = await tc.PostInfluxTelemetry(new InfluxTelemetry
+            ActionResult webResponse = tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = "",
                 Signature = "",

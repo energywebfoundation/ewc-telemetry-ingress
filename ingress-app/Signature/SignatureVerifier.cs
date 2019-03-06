@@ -78,6 +78,7 @@ namespace webapi
             {
                 //throw new SignatureVerifyException("Unable to verify signature",ex);
                 //TO DO we can log this afterMVP but verify sig method must return false
+                Console.WriteLine("Signature Verification Failed {0}", ex.ToString());
                 return false;
             }
         }
