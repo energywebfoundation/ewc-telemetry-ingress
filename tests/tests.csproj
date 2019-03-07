@@ -22,7 +22,7 @@
   </ItemGroup>
 
     <ItemGroup>
-        <None Include="appsettings.test.json" CopyToOutputDirectory="Always" />
+        <None Include="appsettings.test.json" CopyToOutputDirectory="Always" />  
     </ItemGroup>
 
 

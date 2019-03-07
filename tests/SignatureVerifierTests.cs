@@ -56,5 +56,17 @@ namespace tests
             bool isValid = SignatureVerifier.IsSignatureValid(payload, signature, pubKey);
             Assert.True(!isValid);
         }
+
+        [Fact]
+        public void PublicKeyImportWithPrivateKeyShouldFail()
+        {
+            bool isValid = SignatureVerifier.IsSignatureValid("this-is-not-important",
+             "absAUKYl78KAI3aA8FDWE2y2JATOCz7OUKG1hVhFNOyjSfwlGXhMA4oe3qou6JEnuKlsx+AqS5O+nz0oJ68FR7gLU8NPrWjVIWqFTyQMS0ntDRMEUl3oZXXD24fy+NaUOZ6o9OPxFASlEN/ueplXSgcedpXLfo0cfWQWM0GcTJ4=",
+             //next we will give public private exported csp
+             "BwIAAACkAABSU0EyAAQAAAEAAQBXZXt7QOileknWzBH2Sg+Yk4INDTbKA5XUUfUe23zUmr6eM1USCNHX3lidZfjk5Emuui1m8k0KnghxcJfOau8iPRpLg/lubMNojpLGe2MXn5GsyjgEpVdE+Cf0pLBAYHcBuBYHj99muMsJrJW1/InbKFa24JuVnBr+MybPuMXqtc9Ehyz/oomfsO6eYguHP4sqrvB595AFTtkKE7TcGmbt1dUWkSTxT0vfkvbVj0C/H8d7XlshIHlG1m2BEnFNi+T5CM2o0MH54c8DXKRhEujS+xeuk+u9POwL2/XLIvUcfMhL6Pt3o+Dk7HRkT3SPhRa/yJeZ1JEHpoVkYJOVfcXLfwijulTXJughtRpgd+0CBk4JSLYj0fkY+QyRWtuHQfAXTscNGGyW8uIMvHfPdNNOwuiKC4yZLfHuw+hQ1FDtTgH+iJ3nW5fwcIKudN0wusnRE3RIDo8QZky8AvAPb9Z/KbZHhpYXriWyfBKAfP9izhZaIcrRT6Fu+N9E+7oWkQY82jRwv237qtKOuqKl/WGcQE42vfBHWxmeKnBSzKZq8o+92oc06o2PYXqNqt38JOXn34W64nccPvINJJMIQ2UFoSydNf9D6iyxde86RDgSbNMxjqwEY3MiQmRs+QTG/8gwm5aiZG9Kr7K+3Vs65yr0NCwBmZ0DqMowmMbaeTrP3JYS/Ngr22p5vqtsYSTTGn/tU9mBL2asfWO4dxvkNXHCDNmendlCwvYKQZJONTS+GgxDfeC5i/lThMP1ua64H3I="
+             );
+            Assert.True(!isValid);
+
+        }
     }
 }
