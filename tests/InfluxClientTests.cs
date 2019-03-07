@@ -150,6 +150,7 @@ namespace tests
 
             var influxLib = new InfluxClient(conobjBufferA);
             influxLib.Enqueue(data, true);
+            System.Threading.Thread.Sleep(2000);
             InfluxCon(conobjBufferA, "CREATE DATABASE \"" + conobjBufferA.DBName + "\"");
 
             if(!notFlushBeforeTimeInterval){
@@ -163,34 +164,29 @@ namespace tests
 
         }
 
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public void SecondBufferFlushOnItemSize(bool notFlushBeforeItemSize)  //first buffer failure test
+        [Fact]
+        public void SecondBufferShouldFlushOnItemSize()  //first buffer failure test
         {
             var conobjBufferA = LineProtocolConfiguration.InitConfiguration();
-            conobjBufferA.FlushBufferItemsSize = 3;
+            conobjBufferA.FlushBufferItemsSize = 2;
             conobjBufferA.FlushBufferSeconds = 300;
             conobjBufferA.FlushSecondBufferSeconds = 50;
-            conobjBufferA.FlushSecondBufferItemsSize = 4;
+            conobjBufferA.FlushSecondBufferItemsSize = 3;
             InfluxCon(conobjBufferA, "DELETE FROM \"datameasurementE\"");
             InfluxCon(conobjBufferA, "DROP DATABASE \"" + conobjBufferA.DBName + "\"");  // dropping db so first buffer fail
 
             List<string> data = new List<string>();
             data.Add("datameasurementE,location=us-midwest temperature=32 1465839830100400200");
             data.Add("datameasurementE,location=us-east temperature=25 1465839830100400201");
-            data.Add("datameasurementE,location=us-east temperature=15 1465839830100400202");
 
             var influxLib = new InfluxClient(conobjBufferA);
             influxLib.Enqueue(data, true);
+            System.Threading.Thread.Sleep(1000); //wait before flush call and db creation so flush dnt pass to influx but to 2nd buffer
             InfluxCon(conobjBufferA, "CREATE DATABASE \"" + conobjBufferA.DBName + "\"");
             System.Threading.Thread.Sleep(2000); //wait for NW latency to Influx
 
             //directly enqueue item in 2nd buffer to trigger flush
-            if (!notFlushBeforeItemSize)
-            {
-                influxLib.Enqueue("datameasurementE,location=us-east temperature=15 1465839830100400203", false);
-            }
+            influxLib.Enqueue("datameasurementE,location=us-east temperature=15 1465839830100400203", false);
 
 
             System.Threading.Thread.Sleep(3000); //wait for 2nd buffer to flush
@@ -198,9 +194,39 @@ namespace tests
             JObject pobj = JObject.Parse(InfluxCon(conobjBufferA, "SELECT * FROM \"datameasurementE\""));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
             var in_count = rows.Children().Count();
-            Assert.Equal((notFlushBeforeItemSize ? 0 : 4), in_count);//Check if row count is now 4
+            Assert.Equal(3, in_count);//Check if row count is now 4
         }
 
+        [Fact]
+        public void SecondBufferShouldNotFlushBeforeItemSize()  //first buffer failure test
+        {
+            var conobjBufferA = LineProtocolConfiguration.InitConfiguration();
+            conobjBufferA.FlushBufferItemsSize = 1;
+            conobjBufferA.FlushBufferSeconds = 300;
+            conobjBufferA.FlushSecondBufferSeconds = 50;
+            conobjBufferA.FlushSecondBufferItemsSize = 42;
+            InfluxCon(conobjBufferA, "DELETE FROM \"datameasurementE\"");
+            InfluxCon(conobjBufferA, "DROP DATABASE " + conobjBufferA.DBName );  // dropping db so first buffer fail
+
+            List<string> data = new List<string>();
+            data.Add("datameasurementE,location=us-midwest temperature=32 1465839830100400200");
+
+            var influxLib = new InfluxClient(conobjBufferA);
+            influxLib.Enqueue(data, true);
+            System.Threading.Thread.Sleep(1000); //wait before flush call and db creation so flush dnt pass to influx but to 2nd buffer
+            InfluxCon(conobjBufferA, "CREATE DATABASE \"" + conobjBufferA.DBName + "\"");
+            System.Threading.Thread.Sleep(2000); //wait for NW latency to Influx
+
+            influxLib.Enqueue("datameasurementE,location=us-east temperature=15 1465839830100400203", false);
+
+
+            System.Threading.Thread.Sleep(3000); //wait for 2nd buffer to flush
+
+            JObject pobj = JObject.Parse(InfluxCon(conobjBufferA, "SELECT * FROM \"datameasurementE\""));
+            var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
+            var in_count = rows.Children().Count();
+            Assert.Equal(0, in_count);//Check if row count is now 4
+        }
 
     }
 }
