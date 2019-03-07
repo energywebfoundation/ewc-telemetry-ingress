@@ -84,5 +84,15 @@ namespace tests
             Assert.Equal(result,true);
 
         }
+
+        [Fact]
+        public void ShouldNotAllowEmptyInput(){
+            string point= "";
+
+            var exception = Assert.Throws<Exception>(() => InfluxPointVerifier.verifyPoint(point));
+            Assert.NotNull(exception);
+            Assert.True(exception.Message.Contains("Invalid Point there must be at least measurement and fieldset seperated by a space, or there must not be tokens other then (measurementtagset fieldset timestamp)"));
+
+        }
     }
 }
