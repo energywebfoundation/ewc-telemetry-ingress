@@ -82,6 +82,7 @@ namespace tests
         {
 
             var conobj = LineProtocolConfiguration.InitConfiguration();
+            conobj.FlushBufferItemsSize = 2;
             var influxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
 
