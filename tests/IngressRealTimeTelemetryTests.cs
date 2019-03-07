@@ -17,44 +17,10 @@ namespace tests
     public class IngressRealTimeTelemetryTests
     {
 
-        public static LineProtocolConnectionParameters InitConfiguration()
-        {
-            bool fromFile = false;
-            LineProtocolConnectionParameters confFileobj = null;
-
-            if (fromFile)
-            {
-                ConfigurationBuilder cb = new ConfigurationBuilder();
-                cb.SetBasePath(System.AppContext.BaseDirectory);
-                cb.AddJsonFile("appsettings.test.json");
-                IConfigurationRoot cr = cb.Build();
-                confFileobj = cr.GetSection("Influx").Get<LineProtocolConnectionParameters>();
-
-            }
-            else
-            {
-
-                confFileobj = new LineProtocolConnectionParameters()
-                {
-                    Address = new Uri("http://influxdb:8086"),
-                    DBName = "telemetry",
-                    User = "root",
-                    Password = "root",
-                    FlushBufferItemsSize = 4,
-                    FlushBufferSeconds = 2,
-                    FlushSecondBufferItemsSize = 1000,
-                    FlushSecondBufferSeconds = 30,
-                    UseGzipCompression = true
-                };
-            }
-
-            return confFileobj;
-        }
-
         [Fact]
         public void NullTelemetryShouldNotRecord()
         {
-            var conobj = InitConfiguration();
+            var conobj = LineProtocolConfiguration.InitConfiguration();
             var influxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
 
@@ -88,7 +54,7 @@ namespace tests
         [Fact]
         public void NullDataShouldNotRecord()
         {
-            var conobj = InitConfiguration();
+            var conobj = LineProtocolConfiguration.InitConfiguration();
             var influxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
 
@@ -107,7 +73,7 @@ namespace tests
         [Fact]
         public void NullPayloadShouldNotRecord()
         {
-            var conobj = InitConfiguration();
+            var conobj = LineProtocolConfiguration.InitConfiguration();
             var influxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
 
@@ -133,7 +99,7 @@ namespace tests
         public void UnRegisteredPublicKeyShouldNotRecord()
         {
 
-            var conobj = InitConfiguration();
+            var conobj = LineProtocolConfiguration.InitConfiguration();
             var influxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
 
@@ -166,7 +132,7 @@ namespace tests
         public void InvalidSignatureShouldNotRecord()
         {
 
-            var conobj = InitConfiguration();
+            var conobj = LineProtocolConfiguration.InitConfiguration();
             var influxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
             keystore.AddKey("node-3", "BgIAAACkAABSU0ExAAQAAAEAAQBXZXt7QOileknWzBH2Sg+Yk4INDTbKA5XUUfUe23zUmr6eM1USCNHX3lidZfjk5Emuui1m8k0KnghxcJfOau8iPRpLg/lubMNojpLGe2MXn5GsyjgEpVdE+Cf0pLBAYHcBuBYHj99muMsJrJW1/InbKFa24JuVnBr+MybPuMXqtQ==");
@@ -201,7 +167,7 @@ namespace tests
         public void ValidTelemetryShouldRecord()
         {
 
-            var conobj = InitConfiguration();
+            var conobj = LineProtocolConfiguration.InitConfiguration();
             conobj.FlushBufferItemsSize = 1;
             var influxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
@@ -239,7 +205,7 @@ namespace tests
         public void EnqueueShouldFailForInvalidPointData()
         {
 
-            var conobj = InitConfiguration();
+            var conobj = LineProtocolConfiguration.InitConfiguration();
             var influxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
 

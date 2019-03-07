@@ -104,9 +104,10 @@ namespace webapi.Controllers
                 //In case of failure worker queue data will be placed in failure handler queue
                 if(workerQueue){
                     Enqueue(content,!workerQueue);
-                }else{
-                    // TODO What to do when failure handler queue fails
                 }
+                /*else{
+                    // TODO What to do when failure handler queue fails
+                }*/
 
                 Console.WriteLine("ERROR: {0}" , errorMessage);
             }
