@@ -67,11 +67,7 @@ namespace webapi
                     throw new KeyLoadException("Was given a private key. Won't continue.");
                 }
 
-                RSAParameters key = rsaCsp.ExportParameters(false);
-
-                // Verify the data and display the result to the 
-                // console.
-                return VerifySignedHash(payloadBytes, signatureBytes, key);
+                return rsaCsp.VerifyData(payloadBytes, new SHA256CryptoServiceProvider(), signatureBytes);
 
             }
             catch(Exception ex)
@@ -79,29 +75,6 @@ namespace webapi
                 //throw new SignatureVerifyException("Unable to verify signature",ex);
                 //TO DO we can log this afterMVP but verify sig method must return false
                 Console.WriteLine("Signature Verification Failed {0}", ex.ToString());
-                return false;
-            }
-        }
-
-        private static bool VerifySignedHash(byte[] dataToVerify, byte[] signatureBytes, RSAParameters key)
-        {
-            try
-            {
-                // Create a new instance of RSACryptoServiceProvider using the 
-                // key from RSAParameters.
-                RSACryptoServiceProvider rsAalg = new RSACryptoServiceProvider();
-
-                rsAalg.ImportParameters(key);
-
-                // Verify the data using the signature.  Pass a new instance of SHA1CryptoServiceProvider
-                // to specify the use of SHA1 for hashing.
-                return rsAalg.VerifyData(dataToVerify, new SHA256CryptoServiceProvider(), signatureBytes); 
-
-            }
-            catch(CryptographicException e)
-            {
-                Console.WriteLine(e.Message);
-
                 return false;
             }
         }

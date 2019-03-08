@@ -64,20 +64,19 @@ namespace webapi.Controllers
 
                 Console.WriteLine($"Accepted telemetry from {telemetryPackage.NodeId} [{telemetryPackage.Payload.Count} metrics]");
                 // Signature valid - record to db
-                _influx.Enqueue(telemetryPackage.Payload , true);
+                _influx.Enqueue(telemetryPackage.Payload, true);
             }
             catch (Exception ex)
             {
-                //return BadRequest(ex.ToString());
-                //TODO Logging error instead of sending back to client
-                Console.WriteLine("ERROR: unable to enqueue: {0}" , ex.ToString());
-               return StatusCode(400);
+
+                Console.WriteLine("ERROR: Unable to enqueue: {0}", ex.ToString());
+                return StatusCode(400);
             }
 
             return Accepted();
         }
 
-         [HttpPost("realtime")]
+        [HttpPost("realtime")]
         public ActionResult PostRealTimeTelemetry([FromBody] RealTimeTelemetry realTimePackage)
         {
             // verify
@@ -85,15 +84,15 @@ namespace webapi.Controllers
                 string.IsNullOrWhiteSpace(realTimePackage.Signature) ||
                 realTimePackage.Payload == null ||
                 string.IsNullOrWhiteSpace(realTimePackage.Payload.Client) ||
-                realTimePackage.Payload?.BlockNum==null || realTimePackage.Payload?.BlockNum<=0 ||
+                realTimePackage.Payload?.BlockNum == null || realTimePackage.Payload?.BlockNum <= 0 ||
                 string.IsNullOrWhiteSpace(realTimePackage.Payload.BlockHash) ||
-                realTimePackage.Payload?.BlockTS==null ||
-                realTimePackage.Payload?.BlockReceived==null ||
-                realTimePackage.Payload?.NumPeers==null || realTimePackage.Payload?.NumPeers<0 ||
-                realTimePackage.Payload?.NumTxInBlock==null || realTimePackage.Payload?.NumTxInBlock<0
+                realTimePackage.Payload?.BlockTS == null ||
+                realTimePackage.Payload?.BlockReceived == null ||
+                realTimePackage.Payload?.NumPeers == null || realTimePackage.Payload?.NumPeers < 0 ||
+                realTimePackage.Payload?.NumTxInBlock == null || realTimePackage.Payload?.NumTxInBlock < 0
                 )
             {
-                Console.WriteLine("bad request");
+                Console.WriteLine("Bad Request");
                 return BadRequest();
             }
 
@@ -123,8 +122,8 @@ namespace webapi.Controllers
             {
                 //Point format |measurement|,tag_set| |field_set| |timestamp|
 
-                Console.WriteLine($"Accepted telemetry from {realTimePackage.NodeId} ]");
-                string influxPoint = string.Format("parity,nodeid={0},client={1} blocknum={2},numpeers={3},blockts={4},numtxinblock={4},propagationtime={5} {6}",
+                Console.WriteLine($"Accepted RT telemetry from {realTimePackage.NodeId} ");
+                string influxPoint = string.Format("parity,nodeid={0},client={1} blocknum={2},numpeers={3},blockts={4},numtxinblock={5},propagationtime={6} {7}",
                         realTimePackage.NodeId,
                         realTimePackage.Payload.Client,
                         realTimePackage.Payload.BlockNum,
@@ -134,15 +133,14 @@ namespace webapi.Controllers
                         (realTimePackage.Payload.BlockReceived - realTimePackage.Payload.BlockTS),
                         realTimePackage.Payload.BlockReceived);
                 // Signature valid - record to db
-                
-                _influx.Enqueue(influxPoint , true);
+
+                _influx.Enqueue(influxPoint, true);
             }
             catch (Exception ex)
             {
-                //return BadRequest(ex.ToString());
-                //TODO Logging error instead of sending back to client
-                Console.WriteLine("ERROR: unable to enqueue: {0}" , ex.ToString());
-               return StatusCode(400);
+
+                Console.WriteLine("ERROR: unable to enqueue RTT: {0}", ex.ToString());
+                return StatusCode(400);
             }
 
             return Accepted();

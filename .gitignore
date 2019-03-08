@@ -5,3 +5,4 @@ bin/
 build/
 *.user
 TestResults/
+lcov.info
