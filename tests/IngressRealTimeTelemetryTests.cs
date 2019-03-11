@@ -233,5 +233,24 @@ namespace tests
             var result = Assert.IsType<StatusCodeResult>(webResponse);
             Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
         }
+
+        [Fact]
+        public void PostCallShouldFailForNullData()
+        {
+
+            var conobj = LineProtocolConfiguration.InitConfiguration();
+            var influxLib = new InfluxClient(conobj);
+            var keystore = new MockKeystore();
+
+            keystore.AddKey("node-3", "BgIAAACkAABSU0ExAAQAAAEAAQBXZXt7QOileknWzBH2Sg+Yk4INDTbKA5XUUfUe23zUmr6eM1USCNHX3lidZfjk5Emuui1m8k0KnghxcJfOau8iPRpLg/lubMNojpLGe2MXn5GsyjgEpVdE+Cf0pLBAYHcBuBYHj99muMsJrJW1/InbKFa24JuVnBr+MybPuMXqtQ==");
+
+            IngressController tc = new IngressController(keystore, influxLib);
+            ActionResult webResponse = tc.PostRealTimeTelemetry(null);
+
+            Assert.NotNull(webResponse);
+            var result = Assert.IsType<BadRequestResult>(webResponse);
+            Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.Equal(0, influxLib.LastInsertCount);
+        }
     }
 }

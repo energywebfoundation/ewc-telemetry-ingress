@@ -20,8 +20,12 @@ namespace tests
         [Fact]
         public void FileEmptyExceptionParamConstructorShouldPass()
         {
-            FileEmptyException ex = new FileEmptyException("Message", new Exception("inner exception"));
+            string msg1 = "outer message 1";
+            string msg2 = "innter message 2";
+            FileEmptyException ex = new FileEmptyException(msg1, new Exception(msg2));
             Assert.NotNull(ex);
+            Assert.Equal(ex.Message, msg1);
+            Assert.Equal(ex.InnerException.Message, msg2);
 
         }
 

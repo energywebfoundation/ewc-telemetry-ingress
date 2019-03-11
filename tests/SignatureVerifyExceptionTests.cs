@@ -20,17 +20,22 @@ namespace tests
         [Fact]
         public void SignatureVerifyExceptionParamConstructorShouldPass()
         {
-            SignatureVerifyException ex = new SignatureVerifyException("Exception message");
+            string msg1 = "Exception message";
+            SignatureVerifyException ex = new SignatureVerifyException(msg1);
             Assert.NotNull(ex);
-            Assert.True(ex.ToString().Contains("Exception message"));
+            Assert.Equal(ex.Message,msg1);
 
         }
 
         [Fact]
         public void SignatureVerifyExceptionSecondParamConstructorShouldPass()
         {
-            SignatureVerifyException ex = new SignatureVerifyException("Message", new Exception("Inner Exception"));
+            string msg1 = "outer message 1";
+            string msg2 = "innter message 2";
+            SignatureVerifyException ex = new SignatureVerifyException(msg1, new Exception(msg2));
             Assert.NotNull(ex);
+            Assert.Equal(ex.Message, msg1);
+            Assert.Equal(ex.InnerException.Message, msg2);
 
         }
 

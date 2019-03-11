@@ -17,6 +17,18 @@ namespace tests
         }
 
         [Fact]
+        public void SignatureVerifyExceptionSecondParamConstructorShouldPass()
+        {
+            string msg1 = "outer message 1";
+            string msg2 = "innter message 2";
+            KeyLoadException ex = new KeyLoadException(msg1, new Exception(msg2));
+            Assert.NotNull(ex);
+            Assert.Equal(ex.Message, msg1);
+            Assert.Equal(ex.InnerException.Message, msg2);
+
+        }
+
+        [Fact]
         public void KeyLoadExceptionSerializationDeserializationShouldPass()
         {
 
