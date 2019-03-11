@@ -102,6 +102,7 @@ namespace tests
 
             var conobj = LineProtocolConfiguration.InitConfiguration();
             conobj.FlushBufferItemsSize = 2;
+            conobj.FlushBufferSeconds = 1;
             var influxLib = new InfluxClient(conobj);
             var keystore = new MockKeystore();
 
@@ -123,7 +124,7 @@ namespace tests
             var result = Assert.IsType<AcceptedResult>(webResponse);
             Assert.Equal((int)HttpStatusCode.Accepted, result.StatusCode);
            
-            System.Threading.Thread.Sleep(conobj.FlushBufferSeconds * 1000 * 2); //wait for Queue to flush
+            System.Threading.Thread.Sleep(conobj.FlushBufferSeconds * 1000 * 4); //wait for Queue to flush
             Assert.Equal(2, influxLib.LastInsertCount);
 
             /*JObject pobj = JObject.Parse(InfluxCon(conobj));
