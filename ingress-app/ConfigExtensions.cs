@@ -8,7 +8,7 @@ namespace webapi
     {
         public static IConfigurationBuilder AddInfluxConfigFromEnvironment(this IConfigurationBuilder configBuilder)
         {
-
+            //Settng ENV valiables into dictionaly with following keys
             var dict = new Dictionary<string, string>();
             string user = Environment.GetEnvironmentVariable("TELEMETRY_INFLUXDB_USER");if (!string.IsNullOrEmpty(user))
             {

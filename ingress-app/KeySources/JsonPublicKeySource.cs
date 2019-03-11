@@ -14,16 +14,19 @@ namespace webapi
         
         public void LoadFromFile(string path, bool createIfEmpty = false)
         {
+            //Path validation
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentNullException(nameof(path),"path can't be null or empty");
             }
 
+            //File existance check
             if (!createIfEmpty && !File.Exists(path))
             {
                 throw new ArgumentException(nameof(path),"No file at path: " + path);
             } 
             
+            //Check if file creation is requested
             if (createIfEmpty && !File.Exists(path))
             {
                 // Create empty keyfile
@@ -43,6 +46,7 @@ namespace webapi
 
         public void LoadFromJson(string json, bool emptyOk = false)
         {
+            //Loading JSON from string
             List<JsonPublicNodeKey> jsonKeys = null;
             try
             {
@@ -53,6 +57,7 @@ namespace webapi
                 throw new KeyLoadException($"Unable to load keys from json",ex); 
             }
 
+            //Check for JSON 0 keys
             if (!emptyOk && jsonKeys.Count == 0)
             {
                 throw new KeyLoadException($"JSON contains no keys");
@@ -63,16 +68,19 @@ namespace webapi
 
         public void SaveToFile()
         {
+            //check for invalid sourcefile
             if (string.IsNullOrWhiteSpace(_sourceFile))
             {
                 throw new Exception("Not loaded from file.");
             }
 
+            //check for file existance
             if (!File.Exists(_sourceFile))
             {
                 throw new FileNotFoundException("Source file no longer exists.");
             }
 
+            //serialization and writing data to file
             string json = JsonConvert.SerializeObject(_loadedKeys, Formatting.Indented);
             File.WriteAllText(_sourceFile,json);
 
@@ -91,6 +99,7 @@ namespace webapi
 
         public void AddKey(string nodeId, string pubkeyAsBase64)
         {
+            //adding new key and saving to file
             _loadedKeys.Add(new JsonPublicNodeKey
             {
                 NodeId = nodeId,
@@ -101,6 +110,7 @@ namespace webapi
 
         public void RemoveKey(string nodeId)
         {
+            //removing key and saving to fil
             var key = _loadedKeys.FirstOrDefault(x => x.NodeId == nodeId);
             if (key == null)
             {
@@ -113,6 +123,7 @@ namespace webapi
 
         public static IPublickeySource FromFile(string keyfileJson, bool createIfEmpty = false)
         {
+            //directly load from file
             JsonPublicKeySource source = new JsonPublicKeySource();
             source.LoadFromFile(keyfileJson,createIfEmpty);
             return source;

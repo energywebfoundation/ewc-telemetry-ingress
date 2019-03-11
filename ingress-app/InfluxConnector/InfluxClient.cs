@@ -35,28 +35,39 @@ namespace webapi.Controllers
 
         public InfluxClient(LineProtocolConnectionParameters paramsObj)
         {
-            //populate necessary fields for Influx Connection
+            //1. populate necessary fields for Influx Connection
+
+            //create HTTP Client for connection to Influx
             _httpClientHandler = new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
             _httpClient = new HttpClient(_httpClientHandler) { BaseAddress = paramsObj.Address };
 
+            //Create Influx POST request URL
             _requestUri = $"write?db={Uri.EscapeDataString(paramsObj.DBName)}";
             if (!string.IsNullOrEmpty(paramsObj.User))
             {
                 _requestUri += $"&u={Uri.EscapeDataString(paramsObj.User)}&p={Uri.EscapeDataString(paramsObj.Password)}";
             }
 
-            //populate necessary fields for buffer
+
+            //2. populate necessary fields for buffer ( Using reactive Programming Rx )
+
+            //Create Subject for first buffer (worker buffer)
             Subject<string> subject = new Subject<string>();
             _synSubject = Subject.Synchronize(subject);
 
+            //Create first buffer ( worker buffer) with provided buffer flush time or buffer item limit for flush
             _subscription = _synSubject
                 .Buffer(TimeSpan.FromSeconds(paramsObj.FlushBufferSeconds), paramsObj.FlushBufferItemsSize)
                 .Subscribe(onNext: async (pointsList) => await SendToInflux(pointsList,true));
 
-            //second buffer in case first fails
+
+
+            //Second buffer in case first fails. If requests fail in first buffer it will queue in 2nd buffer
+            //Create Subject for second buffer (failure handler buffer)
             Subject<string> subjectSecondQueue = new Subject<string>();
             _synSubjectSecondQueue = Subject.Synchronize(subjectSecondQueue);
 
+            //Create second buffer ( failure handler buffer) with provided buffer flush time or buffer item limit for flush
             _subscriptionSecondQueue = _synSubjectSecondQueue
                 .Buffer(TimeSpan.FromSeconds(paramsObj.FlushSecondBufferSeconds), paramsObj.FlushSecondBufferItemsSize)
                 .Subscribe(onNext: async (pointsListSecondQueue) => await SendToInflux(pointsListSecondQueue, false));
@@ -64,11 +75,13 @@ namespace webapi.Controllers
 
         private async Task<string> SendToInflux(IList<string> content,bool workerQueue, CancellationToken cancellationToken = default(CancellationToken))
         {
+            //this function is called when buffer flush is triggered based on provided time or item size limit
             if (content == null || content.Count == 0)
             {
                 return "";
             }
 
+            // creating Influx Points contents by joining flushed data
             var stringContent = new StringContent(
                 string.Join(Environment.NewLine, content), 
                 Encoding.UTF8, 
@@ -78,9 +91,10 @@ namespace webapi.Controllers
             HttpResponseMessage response = null;
             try
             {
+                // HTTP Post Request to Influx
                 response = await _httpClient.PostAsync(_requestUri, stringContent, cancellationToken);
 
-
+                // Status code returned from Influx
                 string httpStatusCode = ((int)response.StatusCode).ToString();
 
                 if (!response.IsSuccessStatusCode)
@@ -90,6 +104,8 @@ namespace webapi.Controllers
                 }
 
                 LastInsertCount=content.Count;
+
+                //Success will always return with following
                 return httpStatusCode;
 
             }
@@ -112,15 +128,19 @@ namespace webapi.Controllers
                 Console.WriteLine("ERROR: {0}" , errorMessage);
             }
 
-            return "error";
+            return "Error";
 
         }
 
         public void Enqueue(IList<string> pointsList, bool workerQueue)
         {
+            // Enqueue method for putting data into biffer, workerQueue is flag for putting data into worker or failure handler buffers
             ISubject<string>  sub = workerQueue?_synSubject : _synSubjectSecondQueue;
+
+            //Itetrate on incoming list and push data in buffer
             foreach (var point in pointsList)
             {
+                //Verify Influx Point, if it is invalid just ignor that
                 if(InfluxPointVerifier.verifyPoint(point))
                     sub.OnNext(point);
             }
@@ -129,13 +149,17 @@ namespace webapi.Controllers
 
         public void Enqueue(string point, bool workerQueue)
         {
+            // Enqueue method for putting data into biffer, workerQueue is flag for putting data into worker or failure handler buffers
             ISubject<string>  sub = workerQueue?_synSubject : _synSubjectSecondQueue;
+
+           //Verify Influx Point, if it is invalid just ignor that
             if(InfluxPointVerifier.verifyPoint(point))
                     sub.OnNext(point);
         }
 
         protected virtual void Dispose(bool disposing)
         {
+            //dispose allocated reqources
             if (!_disposedValue)
             {
                 if (disposing)

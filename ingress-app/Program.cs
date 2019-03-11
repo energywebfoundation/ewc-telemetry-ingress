@@ -46,21 +46,27 @@ namespace webapi
                 Console.WriteLine($"{c.Key} ==> {c.Value}");
             }
 
+            //Getting certificate path for SSL
             string certificatePath = Path.GetFullPath(Path.Combine(config.GetValue("INTERNAL_DIR", "./"), "telemetry-ingress.pfx"));
 
+            //verify if certificate exists on given path
             if (!File.Exists(certificatePath))
             {
                 Console.WriteLine($"Error: Unable to read certificate from {certificatePath}. File not found");
                 return;
             }
 
+            //get certificate password
             string keyPassword = config.GetValue("KEYPASS", String.Empty);
+
+            //certificate key password validation
             if (String.IsNullOrWhiteSpace(keyPassword))
             {
                 Console.WriteLine($"Error: Certificate password not provided.");
                 return;
             }
 
+            // Configure and instantiate Web Host 
             IWebHost host = new WebHostBuilder()
                 .UseConfiguration(config)
                 .UseStartup<Startup>()
@@ -72,7 +78,7 @@ namespace webapi
                 })
                 .Build();
 
-            //Added for unit testing Program class, as we donot want to actually invoke host.Run in tests
+            //Added for unit testing Program class, as we donot want to actually invoke host.Run in unit tests
             string startSignal = config.GetValue("STARTSERVICE", String.Empty);
             if (String.IsNullOrWhiteSpace(startSignal))
             {
