@@ -23,11 +23,11 @@ namespace webapi.Controllers
             _influx = influx;
         }
 
-        // POST api/values
+        // POST api/ingress/influx for telemetry persistance to influx after validaton and signature verification
         [HttpPost("influx")]
         public ActionResult PostInfluxTelemetry([FromBody] InfluxTelemetry telemetryPackage)
         {
-            // verify
+            // verify in coming data
             if (telemetryPackage?.NodeId == null ||
                 string.IsNullOrWhiteSpace(telemetryPackage.Signature) ||
                 telemetryPackage.Payload == null ||

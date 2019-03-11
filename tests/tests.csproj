@@ -23,6 +23,9 @@
 
     <ItemGroup>
         <None Include="appsettings.test.json" CopyToOutputDirectory="Always" />  
+        <None Include="appsettings.json" CopyToOutputDirectory="Always" />  
+        <None Include="keyfile.json" CopyToOutputDirectory="Always" /> 
+         <None Include="telemetry-ingress.pfx" CopyToOutputDirectory="Always" /> 
     </ItemGroup>
 
 

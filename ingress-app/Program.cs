@@ -32,13 +32,13 @@ namespace webapi
                 // TODO: Keystore not taken from singleton as this happens later on
                 var keystore = JsonPublicKeySource.FromFile(
                     Path.Combine(config.GetValue<string>("INTERNAL_DIR", "./"), "keyfile.json"), true);
-                
-                var keymgr = new KeyManagement(config,keystore);
+
+                var keymgr = new KeyManagement(config, keystore);
                 keymgr.ProcessKeyCommand(keyCommandMode);
                 return;
             }
-            
-            
+
+
             // print config
             // TODO: remove after done
             foreach (var c in config.AsEnumerable())
@@ -46,8 +46,8 @@ namespace webapi
                 Console.WriteLine($"{c.Key} ==> {c.Value}");
             }
 
-            string certificatePath = Path.GetFullPath(Path.Combine(config.GetValue("INTERNAL_DIR","./"),"telemetry-ingress.pfx"));
-            
+            string certificatePath = Path.GetFullPath(Path.Combine(config.GetValue("INTERNAL_DIR", "./"), "telemetry-ingress.pfx"));
+
             if (!File.Exists(certificatePath))
             {
                 Console.WriteLine($"Error: Unable to read certificate from {certificatePath}. File not found");
@@ -72,8 +72,13 @@ namespace webapi
                 })
                 .Build();
 
-            host.Run();
+            //Added for unit testing Program class, as we donot want to actually invoke host.Run in tests
+            string startSignal = config.GetValue("STARTSERVICE", String.Empty);
+            if (String.IsNullOrWhiteSpace(startSignal))
+            {
+                host.Run();
+            }
         }
-       
+
     }
 }
