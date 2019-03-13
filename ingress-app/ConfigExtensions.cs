@@ -4,33 +4,42 @@ using Microsoft.Extensions.Configuration;
 
 namespace webapi
 {
-    public static class ConfigExtensions 
+    /// <summary>
+    /// The class for Configuration Extensions
+    /// </summary>
+    public static class ConfigExtensions
     {
+
+        /// <summary>
+        /// Adds provided TELEMETRY configuraiton params from Environment variables into Disctionary and adds that to Configuration Builder Object
+        /// </summary>
+        /// <param name="configBuilder">Expects ConfigurationBuilder as input</param>
+        /// <returns>ConfigurationBuilder reference</returns>
         public static IConfigurationBuilder AddInfluxConfigFromEnvironment(this IConfigurationBuilder configBuilder)
         {
             //Settng ENV valiables into dictionaly with following keys
             var dict = new Dictionary<string, string>();
-            string user = Environment.GetEnvironmentVariable("TELEMETRY_INFLUXDB_USER");if (!string.IsNullOrEmpty(user))
+            string user = Environment.GetEnvironmentVariable("TELEMETRY_INFLUXDB_USER"); if (!string.IsNullOrEmpty(user))
             {
-                dict.Add("Influx:User",user);
+                dict.Add("Influx:User", user);
             }
-            
+
             string pw = Environment.GetEnvironmentVariable("TELEMETRY_INFLUXDB_USER_PASSWORD");
             if (!string.IsNullOrEmpty(pw))
             {
-                dict.Add("Influx:Password",pw);
+                dict.Add("Influx:Password", pw);
             }
 
             string db = Environment.GetEnvironmentVariable("TELEMETRY_INFLUXDB_DB");
             if (!string.IsNullOrEmpty(db))
             {
-                dict.Add("Influx:DBName",db);
+                dict.Add("Influx:DBName", db);
             }
-            
+
             string host = Environment.GetEnvironmentVariable("TELEMETRY_INFLUXDB_HOST");
             if (!string.IsNullOrEmpty(host))
             {
-                dict.Add("Influx:Address",host);
+                dict.Add("Influx:Address", host);
             }
 
             configBuilder.AddInMemoryCollection(dict);

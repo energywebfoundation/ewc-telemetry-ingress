@@ -9,6 +9,10 @@ using Newtonsoft.Json;
 
 namespace webapi.Controllers
 {
+    /// <summary>
+    /// IngressController exposes Restful endpoints having features as Telemetry verification, validation, security and persistance to Influx
+    /// </summary>
+
     [Route("api/ingress")]
     [ApiController]
     public class IngressController : ControllerBase
@@ -17,13 +21,25 @@ namespace webapi.Controllers
         private readonly IInfluxClient _influx;
 
 
+        /// <summary>
+        /// IngressController constructor for Controller initialization
+        /// </summary>
+        /// <param name="keystore">PublickeySource instance reference</param>
+        /// <param name="influx">InfluxClient instance reference, that will be used for data persistance</param>
+        /// <returns>returns instance of IngressController</returns>
         public IngressController(IPublickeySource keystore, IInfluxClient influx)
         {
             _keyStore = keystore;
             _influx = influx;
         }
 
-        // POST api/ingress/influx for telemetry persistance to influx after validaton and signature verification
+        /// <summary>
+        /// Restful endpoint - POST api/ingress/influx for telemetry persistance to influx after validation and signature verification.
+        /// The method only enqueues incoming data into worker buffer, so once buffer flush trigger is called then actual data is sent to Influx.
+        /// In case worker buffer fails then data is flushed to failure handler buffer. Buffers flushing settings can be configured using appsettings.json
+        /// </summary>
+        /// <param name="telemetryPackage">Expects InfluxTelemetry JSON object in form body</param>
+        /// <returns>returns instance of ActionResult HTTP status code (400: Bad Request, 403: Unauthorized, 202: Accepted)</returns>
         [HttpPost("influx")]
         public ActionResult PostInfluxTelemetry([FromBody] InfluxTelemetry telemetryPackage)
         {
@@ -76,6 +92,14 @@ namespace webapi.Controllers
             return Accepted();
         }
 
+
+        /// <summary>
+        /// Restful endpoint - POST api/ingress/realtime for realtime telemetry persistance to influx after validation and signature verification.
+        /// The method only enqueues incoming data into worker buffer, so once buffer flush trigger is called then actual data is sent to Influx.
+        /// In case worker buffer fails then data is flushed to failure handler buffer. Buffers flushing settings can be configured using appsettings.json
+        /// </summary>
+        /// <param name="realTimePackage">Expects RealTimeTelemetry JSON object in form body</param>
+        /// <returns>returns instance of ActionResult HTTP status code (400: Bad Request, 403: Unauthorized, 202: Accepted)</returns>
         [HttpPost("realtime")]
         public ActionResult PostRealTimeTelemetry([FromBody] RealTimeTelemetry realTimePackage)
         {
@@ -133,7 +157,7 @@ namespace webapi.Controllers
                         realTimePackage.Payload.NumTxInBlock,
                         (realTimePackage.Payload.BlockReceived - realTimePackage.Payload.BlockTS),
                         realTimePackage.Payload.BlockReceived);
-                
+
                 // Signature valid - record to db
                 _influx.Enqueue(influxPoint, true);
             }
