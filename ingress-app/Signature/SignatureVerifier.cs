@@ -6,6 +6,9 @@ using System.Text;
 namespace webapi
 {
 
+    /// <summary>
+    /// Class having functionality of verifying that a given payload was signed with the correct key
+    /// </summary>
     public class SignatureVerifier
     {
 
@@ -18,7 +21,7 @@ namespace webapi
         /// <returns>true if signature is valid, otherwise false</returns>
         public static bool IsSignatureValid(string payload, string signature, string publicKey)
         {
-           
+
             try
             {
                 // Decode payload and signature to bytes
@@ -26,12 +29,12 @@ namespace webapi
                 byte[] payloadBytes = byteConverter.GetBytes(payload);
                 byte[] signatureBytes = Convert.FromBase64String(signature);
 
-                
+
                 // Get csp and load public key
                 byte[] publicKeyBytes = Convert.FromBase64String(publicKey);
                 RSACryptoServiceProvider rsaCsp = new RSACryptoServiceProvider();
                 rsaCsp.ImportCspBlob(publicKeyBytes);
-                
+
                 // Make sure we've loaded a public key
                 if (!rsaCsp.PublicOnly)
                 {
@@ -42,7 +45,7 @@ namespace webapi
                 return rsaCsp.VerifyData(payloadBytes, new SHA256CryptoServiceProvider(), signatureBytes);
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 //throw new SignatureVerifyException("Unable to verify signature",ex);
                 //TO DO we can log this afterMVP but verify sig method must return false
@@ -50,6 +53,6 @@ namespace webapi
                 return false;
             }
         }
-        
+
     }
 }

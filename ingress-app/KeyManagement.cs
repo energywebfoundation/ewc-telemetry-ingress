@@ -3,17 +3,29 @@ using Microsoft.Extensions.Configuration;
 
 namespace webapi
 {
+    /// <summary>
+    /// The class for Key Management having functionality like adding or removing keys based on provided command
+    /// </summary>
     public class KeyManagement
     {
         private readonly IConfigurationRoot _config;
         private readonly IPublickeySource _keystore;
 
+        /// <summary>
+        /// Constructor of KeyManagement
+        /// </summary>
+        /// <param name="config">Expects ConfigurationRoot as input</param>
+        /// <param name="keystore">Expects PublickeySource as input</param>
+        /// <returns>Instance of KeyManagement</returns>
         public KeyManagement(IConfigurationRoot config, IPublickeySource keystore)
         {
             _config = config;
             _keystore = keystore;
         }
 
+        /// <summary>
+        /// This funciton adds key and node Id to key source.
+        /// </summary>
         private void AddKey()
         {
             //Adding key into key store
@@ -30,7 +42,7 @@ namespace webapi
                 Console.WriteLine("ERR: Please provide --validator");
                 return;
             }
-            
+
             if (string.IsNullOrWhiteSpace(pubkeyAsBase64))
             {
                 Console.WriteLine("ERR: Please provide --publickey");
@@ -42,7 +54,10 @@ namespace webapi
             Console.WriteLine($"Key for {validator} added.");
 
         }
-        
+
+        /// <summary>
+        /// This funciton removes key and node Id from key source.
+        /// </summary>
         private void RemoveKey()
         {
             // Removing key from key store
@@ -62,7 +77,11 @@ namespace webapi
             Console.WriteLine($"Key for {validator} removed.");
 
         }
-        
+
+        /// <summary>
+        /// Processes provided command for adding or removing key
+        /// </summary>
+        /// <param name="keyCommandMode">Input command 'add'fpr adding key, and 'remove' for removing key</param>
         public void ProcessKeyCommand(string keyCommandMode)
         {
             //Pocess incoming command for key adding or removing from keystore
@@ -78,7 +97,7 @@ namespace webapi
                     // check
                     RemoveKey();
                     break;
-                    
+
                 default:
                     Console.WriteLine("ERR: Unknown key command");
                     return;

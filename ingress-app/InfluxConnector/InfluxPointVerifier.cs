@@ -1,15 +1,26 @@
 using System;
 
-namespace  webapi.Controllers
+namespace webapi.Controllers
 {
+    /// <summary>
+    /// The Class for Influx data points verification.
+    /// </summary>
     public class InfluxPointVerifier
     {
+
+        /// <summary>
+        /// this funciton verifies Influx Point by checking Influx data point syntax and data types.
+        /// Valid Point format is |measurement|,tag_set| |field_set| |timestamp|
+        /// </summary>
+        /// <param name="point">The Influx Point to be checked.</param>
+        /// <returns>returns true if provided point is a valid Influx data point and false if it is invalid</returns>
+        /// <exception cref="System.Exception">Thrown when provided point have invalid measurement or tag or field or timestamp.</exception>
         public static bool verifyPoint(string point)
         {
             string[] tokens = point.Split(' ');
 
             // invalid Point there must be at least measurement and fieldset seperated by a space, or there must not be tokens other then (measurementtagset fieldset timestamp)
-            if (tokens.Length < 2 || tokens.Length > 3) 
+            if (tokens.Length < 2 || tokens.Length > 3)
             {
                 throw new Exception("Invalid Point there must be at least measurement and fieldset seperated by a space, or there must not be tokens other then (measurementtagset fieldset timestamp) " + tokens.Length);
             }
@@ -19,7 +30,7 @@ namespace  webapi.Controllers
 
             //measurement name should be valid string
             if (string.IsNullOrWhiteSpace(measurementAndTagSet[0]) || measurementAndTagSet[0].Contains('\'')
-                || measurementAndTagSet[0].Contains('"')) 
+                || measurementAndTagSet[0].Contains('"'))
             {
                 throw new Exception("Measurement name should be valid string");
             }
@@ -65,7 +76,7 @@ namespace  webapi.Controllers
             {
                 long holder = 0;
                 //Check for invalid timestamp
-                bool result = System.Int64.TryParse(tokens[2], out holder); 
+                bool result = System.Int64.TryParse(tokens[2], out holder);
                 if (!result)
                 {
                     throw new Exception("Invalid timestamp " + tokens[2]);

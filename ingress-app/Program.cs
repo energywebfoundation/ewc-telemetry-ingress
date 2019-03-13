@@ -9,8 +9,23 @@ using Microsoft.Extensions.Configuration;
 
 namespace webapi
 {
+    /// <summary>
+    /// Class with entry point of project
+    /// </summary>
     public class Program
     {
+        /// <summary>
+        /// Program entry point
+        /// </summary>
+        /// <param name="args">Command Line arguments, 
+        /// INTERNAL_DIR: for setting internal dir path.
+        /// KEYPASS: for passwod for decryption of SSL Certificate
+        /// STARTSERVICE: flag for indication of starting WebHost, Added for unit testing Program class, as we donot want to actually invoke host.Run in unit tests
+        /// validator: to be used with add or remove command line arg for adding into or removing from key source
+        /// publickey: to be used with add or remove command line arg for adding into or removing from key source
+        /// add: adding into key source
+        /// remove: removing into key source
+        /// </param>
         public static void Main(string[] args)
         {
             // build config
