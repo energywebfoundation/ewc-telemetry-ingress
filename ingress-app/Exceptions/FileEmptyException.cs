@@ -19,7 +19,7 @@ namespace webapi
         }
 
         /// <summary>
-        ///  Parametrized Constructor of FileEmptyException with message
+        ///  Parameterized Constructor of FileEmptyException with message
         /// </summary>
         /// <param name="message">The message string for FileEmptyException</param>
         /// <returns>returns instance of FileEmptyException with custom message</returns>
@@ -28,7 +28,7 @@ namespace webapi
         }
 
         /// <summary>
-        ///  Parametrized Constructor of FileEmptyException with message and Inner Exception
+        ///  Parameterized Constructor of FileEmptyException with message and Inner Exception
         /// </summary>
         /// <param name="message">The message string for FileEmptyException</param>
         /// <param name="inner">The inner Exception reference for FileEmptyException</param>
@@ -38,7 +38,7 @@ namespace webapi
         }
 
         /// <summary>
-        ///  Parametrized Constructor of FileEmptyException with SerializationInfo and StreamingContext
+        ///  Parameterized Constructor of FileEmptyException with SerializationInfo and StreamingContext
         /// </summary>
         /// <param name="info">The serialization info for FileEmptyException</param>
         /// <param name="context">The streaming context for FileEmptyException</param>

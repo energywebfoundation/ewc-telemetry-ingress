@@ -11,13 +11,13 @@ namespace webapi
     {
 
         /// <summary>
-        /// Adds provided TELEMETRY configuraiton params from Environment variables into Disctionary and adds that to Configuration Builder Object
+        /// Adds provided TELEMETRY configuration params from Environment variables into Dictionary and adds that to Configuration Builder Object
         /// </summary>
         /// <param name="configBuilder">Expects ConfigurationBuilder as input</param>
         /// <returns>ConfigurationBuilder reference</returns>
         public static IConfigurationBuilder AddInfluxConfigFromEnvironment(this IConfigurationBuilder configBuilder)
         {
-            //Settng ENV valiables into dictionaly with following keys
+            //Setting ENV variables into dictionary with following keys
             var dict = new Dictionary<string, string>();
             string user = Environment.GetEnvironmentVariable("TELEMETRY_INFLUXDB_USER"); if (!string.IsNullOrEmpty(user))
             {

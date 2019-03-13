@@ -13,7 +13,7 @@ using System.Collections.Generic;
 /*
 TODOs:
     - Define Influx RTO, according to that write requests on disk and once Influx is up read requests and resent to Influx
-    - Optimazation testing - buffer flush settings time and # of requests
+    - Optimization testing - buffer flush settings time and # of requests
  */
 
 namespace webapi.Controllers
@@ -33,7 +33,7 @@ namespace webapi.Controllers
         private bool _disposedValue;
 
         /// <summary>
-        /// LastInsertCount trackes number of points inserted into Influx in last Flush trigger.Its used for unit testing only.
+        /// LastInsertCount tracks number of points inserted into Influx in last Flush trigger.Its used for unit testing only.
         /// </summary>
         public int LastInsertCount { get; private set; } = 0;
 
@@ -158,13 +158,13 @@ namespace webapi.Controllers
         /// <param name="workerQueue">The Flag for indication if provided points should be enqueued into worker buffer or failure handler buffer</param>
         public void Enqueue(IList<string> pointsList, bool workerQueue)
         {
-            // Enqueue method for putting data into biffer, workerQueue is flag for putting data into worker or failure handler buffers
+            // Enqueue method for putting data into buffer, workerQueue is flag for putting data into worker or failure handler buffers
             ISubject<string> sub = workerQueue ? _synSubject : _synSubjectSecondQueue;
 
-            //Itetrate on incoming list and push data in buffer
+            //iterates on incoming list and push data in buffer
             foreach (var point in pointsList)
             {
-                //Verify Influx Point, if it is invalid just ignor that
+                //Verify Influx Point, if it is invalid just ignore that
                 if (InfluxPointVerifier.verifyPoint(point))
                     sub.OnNext(point);
             }
@@ -177,10 +177,10 @@ namespace webapi.Controllers
         /// <param name="workerQueue">The Flag for indication if provided points should be enqueued into worker buffer or failure handler buffer</param>
         public void Enqueue(string point, bool workerQueue)
         {
-            // Enqueue method for putting data into biffer, workerQueue is flag for putting data into worker or failure handler buffers
+            // Enqueue method for putting data into buffer, workerQueue is flag for putting data into worker or failure handler buffers
             ISubject<string> sub = workerQueue ? _synSubject : _synSubjectSecondQueue;
 
-            //Verify Influx Point, if it is invalid just ignor that
+            //Verify Influx Point, if it is invalid just ignore that
             if (InfluxPointVerifier.verifyPoint(point))
                 sub.OnNext(point);
         }
@@ -191,7 +191,7 @@ namespace webapi.Controllers
         /// <param name="disposing">The single Influx point</param>
         protected virtual void Dispose(bool disposing)
         {
-            //dispose allocated reqources
+            //dispose allocated resources
             if (!_disposedValue)
             {
                 if (disposing)

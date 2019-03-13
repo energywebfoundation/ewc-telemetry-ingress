@@ -19,8 +19,8 @@ namespace webapi
         /// </summary>
         /// <param name="args">Command Line arguments, 
         /// INTERNAL_DIR: for setting internal dir path.
-        /// KEYPASS: for passwod for decryption of SSL Certificate
-        /// STARTSERVICE: flag for indication of starting WebHost, Added for unit testing Program class, as we donot want to actually invoke host.Run in unit tests
+        /// KEYPASS: for password for decryption of SSL Certificate
+        /// STARTSERVICE: flag for indication of starting WebHost, Added for unit testing Program class, as we dont want to actually invoke host.Run in unit tests
         /// validator: to be used with add or remove command line arg for adding into or removing from key source
         /// publickey: to be used with add or remove command line arg for adding into or removing from key source
         /// add: adding into key source
@@ -93,7 +93,7 @@ namespace webapi
                 })
                 .Build();
 
-            //Added for unit testing Program class, as we donot want to actually invoke host.Run in unit tests
+            //Added for unit testing Program class, as we dont want to actually invoke host.Run in unit tests
             string startSignal = config.GetValue("STARTSERVICE", String.Empty);
             if (String.IsNullOrWhiteSpace(startSignal))
             {
