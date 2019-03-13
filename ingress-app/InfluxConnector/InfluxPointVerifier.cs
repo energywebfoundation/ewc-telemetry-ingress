@@ -8,15 +8,18 @@ namespace  webapi.Controllers
         {
             string[] tokens = point.Split(' ');
 
-            if (tokens.Length < 2 || tokens.Length > 3) // invalid Point there must be at least measurement and fieldset seperated by a space, or there must not be tokens other then (measurementtagset fieldset timestamp)
+            // invalid Point there must be at least measurement and fieldset seperated by a space, or there must not be tokens other then (measurementtagset fieldset timestamp)
+            if (tokens.Length < 2 || tokens.Length > 3) 
             {
                 throw new Exception("Invalid Point there must be at least measurement and fieldset seperated by a space, or there must not be tokens other then (measurementtagset fieldset timestamp) " + tokens.Length);
             }
 
+            // getting measurement and Tags Set
             string[] measurementAndTagSet = tokens[0].Split(',');
 
+            //measurement name should be valid string
             if (string.IsNullOrWhiteSpace(measurementAndTagSet[0]) || measurementAndTagSet[0].Contains('\'')
-                || measurementAndTagSet[0].Contains('"')) //measurement name should be valid string
+                || measurementAndTagSet[0].Contains('"')) 
             {
                 throw new Exception("Measurement name should be valid string");
             }
@@ -29,6 +32,7 @@ namespace  webapi.Controllers
 
                     string[] tagKeyValue = (measurementAndTagSet[i]).Split('=');
 
+                    //verifying tags individually
                     if (tagKeyValue.Length != 2 ||
                     string.IsNullOrWhiteSpace(tagKeyValue[0]) || string.IsNullOrWhiteSpace(tagKeyValue[1]) ||
                     tagKeyValue[0].Contains('\'') || tagKeyValue[0].Contains('"') ||
@@ -46,6 +50,7 @@ namespace  webapi.Controllers
 
                 string[] fieldKeyValue = field.Split('=');
 
+                //Validation of fields individually
                 if (fieldKeyValue.Length != 2 ||
                     string.IsNullOrWhiteSpace(fieldKeyValue[0]) || string.IsNullOrWhiteSpace(fieldKeyValue[1]) ||
                     fieldKeyValue[0].Contains('\'') || fieldKeyValue[0].Contains('"') ||
@@ -59,7 +64,8 @@ namespace  webapi.Controllers
             if (tokens.Length == 3)
             {
                 long holder = 0;
-                bool result = System.Int64.TryParse(tokens[2], out holder); //if its valid time stamp then return true
+                //Check for invalid timestamp
+                bool result = System.Int64.TryParse(tokens[2], out holder); 
                 if (!result)
                 {
                     throw new Exception("Invalid timestamp " + tokens[2]);

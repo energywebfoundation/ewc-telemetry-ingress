@@ -72,13 +72,15 @@ namespace tests
             data.Add("datameasurementA,location=us-midwest temperature=82 1465839830100400200");
 
             var influxLib = new InfluxClient(conobj);
-            if(useListEnqueue){
+            if (useListEnqueue)
+            {
                 influxLib.Enqueue(data, true);
             }
-            else{
+            else
+            {
                 influxLib.Enqueue(data[0], true);
             }
-            
+
 
             JObject pobj = JObject.Parse(InfluxCon(conobj, "SELECT * FROM \"datameasurementA\""));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
@@ -153,14 +155,15 @@ namespace tests
             System.Threading.Thread.Sleep(2000);
             InfluxCon(conobjBufferA, "CREATE DATABASE \"" + conobjBufferA.DBName + "\"");
 
-            if(!notFlushBeforeTimeInterval){
+            if (!notFlushBeforeTimeInterval)
+            {
                 System.Threading.Thread.Sleep((conobjBufferA.FlushSecondBufferSeconds + 1) * 1000); //wait for 2nd buffer to flush
             }
 
             JObject pobj = JObject.Parse(InfluxCon(conobjBufferA, "SELECT * FROM \"datameasurementD\""));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
             var in_count = rows.Children().Count();
-            Assert.Equal((notFlushBeforeTimeInterval?0:2), in_count);//Check if row count is now 2
+            Assert.Equal((notFlushBeforeTimeInterval ? 0 : 2), in_count);//Check if row count is now 2
 
         }
 
@@ -206,7 +209,7 @@ namespace tests
             conobjBufferA.FlushSecondBufferSeconds = 50;
             conobjBufferA.FlushSecondBufferItemsSize = 42;
             InfluxCon(conobjBufferA, "DELETE FROM \"datameasurementE\"");
-            InfluxCon(conobjBufferA, "DROP DATABASE " + conobjBufferA.DBName );  // dropping db so first buffer fail
+            InfluxCon(conobjBufferA, "DROP DATABASE " + conobjBufferA.DBName);  // dropping db so first buffer fail
 
             List<string> data = new List<string>();
             data.Add("datameasurementE,location=us-midwest temperature=32 1465839830100400200");
@@ -226,6 +229,15 @@ namespace tests
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
             var in_count = rows.Children().Count();
             Assert.Equal(0, in_count);//Check if row count is now 4
+        }
+
+        [Fact]
+        public void InfluxClientDisposeTestShouldPass()  //first buffer failure test
+        {
+            //for coverage
+            InfluxClient ic = new InfluxClient(LineProtocolConfiguration.InitConfiguration());
+            ic.Dispose();
+
         }
 
     }

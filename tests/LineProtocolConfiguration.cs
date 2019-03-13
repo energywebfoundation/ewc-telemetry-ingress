@@ -8,7 +8,7 @@ namespace tests
     {
         public static LineProtocolConnectionParameters InitConfiguration()
         {
-            bool fromFile = true;
+            bool fromFile = false;
             LineProtocolConnectionParameters confFileobj = null;
 
             if (fromFile)

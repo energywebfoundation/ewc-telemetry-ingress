@@ -38,6 +38,7 @@ namespace webapi
                     throw new KeyLoadException("Was given a private key. Won't continue.");
                 }
 
+                //Actualy verify data call
                 return rsaCsp.VerifyData(payloadBytes, new SHA256CryptoServiceProvider(), signatureBytes);
 
             }
