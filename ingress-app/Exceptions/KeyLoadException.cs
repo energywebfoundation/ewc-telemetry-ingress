@@ -19,7 +19,7 @@ namespace webapi
         }
 
         /// <summary>
-        ///  Parametrized Constructor of KeyLoadException with message
+        ///  Parameterized Constructor of KeyLoadException with message
         /// </summary>
         /// <param name="message">The message string for KeyLoadException</param>
         /// <returns>returns instance of KeyLoadException with custom message</returns>
@@ -28,7 +28,7 @@ namespace webapi
         }
 
         /// <summary>
-        ///  Parametrized Constructor of KeyLoadException with message and Inner Exception
+        ///  Parameterized Constructor of KeyLoadException with message and Inner Exception
         /// </summary>
         /// <param name="message">The message string for KeyLoadException</param>
         /// <param name="inner">The inner Exception reference for KeyLoadException</param>
@@ -38,7 +38,7 @@ namespace webapi
         }
 
         /// <summary>
-        ///  Parametrized Constructor of KeyLoadException with SerializationInfo and StreamingContext
+        ///  Parameterized Constructor of KeyLoadException with SerializationInfo and StreamingContext
         /// </summary>
         /// <param name="info">The serialization info for KeyLoadException</param>
         /// <param name="context">The streaming context for KeyLoadException</param>

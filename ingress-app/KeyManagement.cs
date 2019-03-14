@@ -24,7 +24,7 @@ namespace webapi
         }
 
         /// <summary>
-        /// This funciton adds key and node Id to key source.
+        /// This function adds key and node Id to key source.
         /// </summary>
         private void AddKey()
         {
@@ -56,7 +56,7 @@ namespace webapi
         }
 
         /// <summary>
-        /// This funciton removes key and node Id from key source.
+        /// This function removes key and node Id from key source.
         /// </summary>
         private void RemoveKey()
         {
@@ -72,7 +72,7 @@ namespace webapi
                 return;
             }
 
-            //remvove validator from key store
+            //remove validator from key store
             _keystore.RemoveKey(validator);
             Console.WriteLine($"Key for {validator} removed.");
 
@@ -81,10 +81,10 @@ namespace webapi
         /// <summary>
         /// Processes provided command for adding or removing key
         /// </summary>
-        /// <param name="keyCommandMode">Input command 'add'fpr adding key, and 'remove' for removing key</param>
+        /// <param name="keyCommandMode">Input command 'add' for adding key, and 'remove' for removing key</param>
         public void ProcessKeyCommand(string keyCommandMode)
         {
-            //Pocess incoming command for key adding or removing from keystore
+            //Process incoming command for key adding or removing from keystore
             Console.WriteLine("Telemetry Ingress - Key Management Mode");
             switch (keyCommandMode)
             {

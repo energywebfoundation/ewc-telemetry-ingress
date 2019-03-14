@@ -9,7 +9,7 @@ namespace webapi.Controllers
     {
 
         /// <summary>
-        /// this funciton verifies Influx Point by checking Influx data point syntax and data types.
+        /// this function verifies Influx Point by checking Influx data point syntax and data types.
         /// Valid Point format is |measurement|,tag_set| |field_set| |timestamp|
         /// </summary>
         /// <param name="point">The Influx Point to be checked.</param>

@@ -19,7 +19,7 @@ namespace webapi
         }
 
         /// <summary>
-        ///  Parametrized Constructor of SignatureVerifyException with message
+        ///  Parameterized Constructor of SignatureVerifyException with message
         /// </summary>
         /// <param name="message">The message string for SignatureVerifyException</param>
         /// <returns>returns instance of SignatureVerifyException with custom message</returns>
@@ -28,7 +28,7 @@ namespace webapi
         }
 
         /// <summary>
-        ///  Parametrized Constructor of SignatureVerifyException with message and Inner Exception
+        ///  Parameterized Constructor of SignatureVerifyException with message and Inner Exception
         /// </summary>
         /// <param name="message">The message string for SignatureVerifyException</param>
         /// <param name="inner">The inner Exception reference for SignatureVerifyException</param>
@@ -38,7 +38,7 @@ namespace webapi
         }
 
         /// <summary>
-        ///  Parametrized Constructor of SignatureVerifyException with SerializationInfo and StreamingContext
+        ///  Parameterized Constructor of SignatureVerifyException with SerializationInfo and StreamingContext
         /// </summary>
         /// <param name="info">The serialization info for SignatureVerifyException</param>
         /// <param name="context">The streaming context for SignatureVerifyException</param>

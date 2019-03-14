@@ -146,7 +146,7 @@ namespace webapi.Controllers
             {
                 //Point format |measurement|,tag_set| |field_set| |timestamp|
 
-                //create a point from incomign JSON
+                //create a point from incoming JSON
                 Console.WriteLine($"Accepted RT telemetry from {realTimePackage.NodeId} ");
                 string influxPoint = string.Format("parity,nodeid={0},client={1} blocknum={2},numpeers={3},blockts={4},numtxinblock={5},propagationtime={6} {7}",
                         realTimePackage.NodeId,
