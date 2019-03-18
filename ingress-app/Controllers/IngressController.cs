@@ -108,7 +108,7 @@ namespace webapi.Controllers
                 string.IsNullOrWhiteSpace(realTimePackage.Signature) ||
                 realTimePackage.Payload == null ||
                 string.IsNullOrWhiteSpace(realTimePackage.Payload.Client) ||
-                realTimePackage.Payload?.BlockNum == null || realTimePackage.Payload?.BlockNum <= 0 ||
+                realTimePackage.Payload?.BlockNum == null || realTimePackage.Payload?.BlockNum < 0 ||
                 string.IsNullOrWhiteSpace(realTimePackage.Payload.BlockHash) ||
                 realTimePackage.Payload?.BlockTS == null ||
                 realTimePackage.Payload?.BlockReceived == null ||
