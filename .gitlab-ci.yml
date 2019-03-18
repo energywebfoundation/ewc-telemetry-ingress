@@ -16,18 +16,18 @@ build-dotnet:
     paths:
       - ingress-app/build/
 
-test-dotnet:
-  stage: test
-  tags:
-    - short-jobs
-  image: microsoft/dotnet:2.2-sdk
-  services:
-    - influxdb
-  script:
-    - curl -i -XPOST http://influxdb:8086/query --data-urlencode "q=CREATE DATABASE telemetry"
-    - dotnet restore
-    - dotnet build
-    - dotnet test
+#test-dotnet:
+#  stage: test
+#  tags:
+#    - short-jobs
+#  image: microsoft/dotnet:2.2-sdk
+#  services:
+#    - influxdb
+#  script:
+#    - curl -i -XPOST http://influxdb:8086/query --data-urlencode "q=CREATE DATABASE telemetry"
+#    - dotnet restore
+#    - dotnet build
+#    - dotnet test
 
 package-docker:
   stage: package
