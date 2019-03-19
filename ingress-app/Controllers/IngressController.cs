@@ -104,16 +104,12 @@ namespace webapi.Controllers
             if (realTimePackage?.NodeId == null ||
                 string.IsNullOrWhiteSpace(realTimePackage.Signature) ||
                 realTimePackage.Payload == null ||
-                string.IsNullOrWhiteSpace(realTimePackage.Payload.Client) ||
-                realTimePackage.Payload?.BlockNum == null || realTimePackage.Payload?.BlockNum <= 0 ||
-                string.IsNullOrWhiteSpace(realTimePackage.Payload.BlockHash) ||
-                realTimePackage.Payload?.BlockTS == null ||
-                realTimePackage.Payload?.BlockReceived == null ||
-                realTimePackage.Payload?.NumPeers == null || realTimePackage.Payload?.NumPeers < 0 ||
-                realTimePackage.Payload?.NumTxInBlock == null || realTimePackage.Payload?.NumTxInBlock < 0
+                string.IsNullOrWhiteSpace(realTimePackage.Payload.Client) || 
+                realTimePackage.Payload.BlockNum <= 0 ||
+                string.IsNullOrWhiteSpace(realTimePackage.Payload.BlockHash)
                 )
             {
-                Console.WriteLine("Bad Request");
+                Console.WriteLine("Bad Request: " + JsonConvert.SerializeObject(realTimePackage,Formatting.Indented) );
                 return BadRequest();
             }
 
