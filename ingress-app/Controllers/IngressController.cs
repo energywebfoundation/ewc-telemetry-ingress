@@ -144,7 +144,7 @@ namespace webapi.Controllers
 
             //create a point from incoming JSON
             Console.WriteLine($"Accepted RT telemetry from {realTimePackage.NodeId} ");
-            string influxPoint = string.Format("parity,nodeid={0},client={1} blocknum={2},numpeers={3},blockts={4},numtxinblock={5},propagationtime={6} {7}",
+            string influxPoint = string.Format("parity,nodeid={0},client={1} blocknum={2},numpeers={3},blockts={4},numtxinblock={5},propagationtime={6},gaslimit={8},gasused={9} {7}",
                     realTimePackage.NodeId,
                     realTimePackage.Payload.Client,
                     realTimePackage.Payload.BlockNum,
@@ -152,7 +152,9 @@ namespace webapi.Controllers
                     realTimePackage.Payload.BlockTS,
                     realTimePackage.Payload.NumTxInBlock,
                     (realTimePackage.Payload.BlockReceived - realTimePackage.Payload.BlockTS),
-                    realTimePackage.Payload.BlockReceived);
+                    realTimePackage.Payload.BlockReceived,
+                    realTimePackage.Payload.GasLimit,
+                    realTimePackage.Payload.GasUsed);
 
             // Signature valid - record to db
             if (_influx.Enqueue(influxPoint, true))
