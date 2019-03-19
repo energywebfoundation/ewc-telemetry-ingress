@@ -16,14 +16,14 @@ namespace webapi.Controllers
         /// </summary>
         /// <param name="points">The List of Influx points</param>
         /// <param name="workerQueue">The Flag for indication if provided points should be enqueued into worker buffer or failure handler buffer</param>
-        void Enqueue(IList<string> points, bool workerQueue);
+        bool Enqueue(IList<string> points, bool workerQueue);
 
         /// <summary>
         ///  Enqueue method for adding single point to buffer.
         /// </summary>
         /// <param name="point">The single Influx point</param>
         /// <param name="workerQueue">The Flag for indication if provided points should be enqueued into worker buffer or failure handler buffer</param>
-        void Enqueue(string point, bool workerQueue);
+        bool Enqueue(string point, bool workerQueue);
 
     }
 }

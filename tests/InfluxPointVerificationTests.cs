@@ -20,7 +20,7 @@ namespace tests
             //Assert.Throws<Exception>(() => InfluxPointVerifier.verifyPoint(point));
             var exception = Assert.Throws<Exception>(() => InfluxPointVerifier.verifyPoint(point));
             Assert.NotNull(exception);
-            Assert.Equal("Measurement name should be valid string", exception.Message);
+            Assert.True( exception.Message.ToString().Contains("Measurement name should be valid string"));
 
         }
 

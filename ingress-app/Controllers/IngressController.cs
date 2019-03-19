@@ -75,21 +75,18 @@ namespace webapi.Controllers
                 return StatusCode(403);
             }
 
-            try
+            Console.WriteLine($"Accepted telemetry from {telemetryPackage.NodeId} [{telemetryPackage.Payload.Count} metrics]");
+            // Signature valid - record to db
+            if (_influx.Enqueue(telemetryPackage.Payload, true))
             {
-
-                Console.WriteLine($"Accepted telemetry from {telemetryPackage.NodeId} [{telemetryPackage.Payload.Count} metrics]");
-                // Signature valid - record to db
-                _influx.Enqueue(telemetryPackage.Payload, true);
+                return Accepted();
             }
-            catch (Exception ex)
+            else
             {
-
-                Console.WriteLine("ERROR: Unable to enqueue: {0}", ex.ToString());
                 return StatusCode(400);
             }
 
-            return Accepted();
+
         }
 
 
@@ -142,33 +139,32 @@ namespace webapi.Controllers
                 return StatusCode(403);
             }
 
-            try
+
+            //Point format |measurement|,tag_set| |field_set| |timestamp|
+
+            //create a point from incoming JSON
+            Console.WriteLine($"Accepted RT telemetry from {realTimePackage.NodeId} ");
+            string influxPoint = string.Format("parity,nodeid={0},client={1} blocknum={2},numpeers={3},blockts={4},numtxinblock={5},propagationtime={6} {7}",
+                    realTimePackage.NodeId,
+                    realTimePackage.Payload.Client,
+                    realTimePackage.Payload.BlockNum,
+                    realTimePackage.Payload.NumPeers,
+                    realTimePackage.Payload.BlockTS,
+                    realTimePackage.Payload.NumTxInBlock,
+                    (realTimePackage.Payload.BlockReceived - realTimePackage.Payload.BlockTS),
+                    realTimePackage.Payload.BlockReceived);
+
+            // Signature valid - record to db
+            if (_influx.Enqueue(influxPoint, true))
             {
-                //Point format |measurement|,tag_set| |field_set| |timestamp|
-
-                //create a point from incoming JSON
-                Console.WriteLine($"Accepted RT telemetry from {realTimePackage.NodeId} ");
-                string influxPoint = string.Format("parity,nodeid={0},client={1} blocknum={2},numpeers={3},blockts={4},numtxinblock={5},propagationtime={6} {7}",
-                        realTimePackage.NodeId,
-                        realTimePackage.Payload.Client,
-                        realTimePackage.Payload.BlockNum,
-                        realTimePackage.Payload.NumPeers,
-                        realTimePackage.Payload.BlockTS,
-                        realTimePackage.Payload.NumTxInBlock,
-                        (realTimePackage.Payload.BlockReceived - realTimePackage.Payload.BlockTS),
-                        realTimePackage.Payload.BlockReceived);
-
-                // Signature valid - record to db
-                _influx.Enqueue(influxPoint, true);
+                return Accepted();
             }
-            catch (Exception ex)
+            else
             {
-
-                Console.WriteLine("ERROR: unable to enqueue RTT: {0}", ex.ToString());
                 return StatusCode(400);
             }
 
-            return Accepted();
+
         }
 
     }
