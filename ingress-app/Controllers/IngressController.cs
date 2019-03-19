@@ -140,6 +140,7 @@ namespace webapi.Controllers
 
             //create a point from incoming JSON
             Console.WriteLine($"Accepted RT telemetry from {realTimePackage.NodeId} ");
+            long nanotimestamp = (long) (realTimePackage.Payload.BlockReceived * 1e9);
             string influxPoint = string.Format("parity,nodeid={0},client={1} blocknum={2},numpeers={3},blockts={4},numtxinblock={5},propagationtime={6},gaslimit={8},gasused={9} {7}",
                     realTimePackage.NodeId,
                     realTimePackage.Payload.Client,
@@ -148,7 +149,7 @@ namespace webapi.Controllers
                     realTimePackage.Payload.BlockTS,
                     realTimePackage.Payload.NumTxInBlock,
                     (realTimePackage.Payload.BlockReceived - realTimePackage.Payload.BlockTS),
-                    realTimePackage.Payload.BlockReceived,
+                    nanotimestamp,
                     realTimePackage.Payload.GasLimit,
                     realTimePackage.Payload.GasUsed);
 
