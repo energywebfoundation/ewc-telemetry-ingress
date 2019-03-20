@@ -12,6 +12,8 @@ namespace tests
         [InlineData(@"parity\ num2,node\ id=0x00000000000000000000000,client\ name=Parityv123 block\ num=123456,numpeers=12,block\ ts=1465839830100400200,numtxinblock=23,propagationtime=0 1465839830100400200")]
         [InlineData("paritynum2,nodeid=0x00000000000000000000000,clientname=\"Parity\'v123\" blocknum=123456,numpeers=12,blockts=1465839830100400200,numtxinblock=23,propagationtime=0 1465839830100400200")]
         [InlineData(@"paritynum2,nodeid=0x00000000000000000000000,clientname=Parity\=v123 blocknum=123456,numpeers=12,blockts=1465839830100400200,region=side\=inn\ top\=bottom,numtxinblock=23,propagationtime=0 1465839830100400200")]
+        [InlineData("parity,nodeid=0x00000000000000000000000,client=\"Parity 123\" blocknum=123456,numpeers=12,blockts=1465839830100400200,numtxinblock=23,propagationtime=0 1465839830100400200")]
+        [InlineData("parity,nodeid=0x00000000000000000000000,client=\"Parity 123\" blocknum=123456,address=\"city=abc,country=def\",numpeers=12,blockts=1465839830100400200,numtxinblock=23,propagationtime=0 1465839830100400200")]
         public void ShouldPassValidPoint(string point)
         {
             bool result = InfluxPointVerifier.verifyPoint(point);

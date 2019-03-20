@@ -79,11 +79,11 @@ namespace webapi.Controllers
             // Signature valid - record to db
             if (_influx.Enqueue(telemetryPackage.Payload, true))
             {
-                return Accepted();
+                return StatusCode(400);
             }
             else
             {
-                return StatusCode(400);
+                return Accepted();
             }
 
 
@@ -105,7 +105,7 @@ namespace webapi.Controllers
                 string.IsNullOrWhiteSpace(realTimePackage.Signature) ||
                 realTimePackage.Payload == null ||
                 string.IsNullOrWhiteSpace(realTimePackage.Payload.Client) || 
-                realTimePackage.Payload.BlockNum <= 0 ||
+                realTimePackage.Payload.BlockNum < 0 ||
                 string.IsNullOrWhiteSpace(realTimePackage.Payload.BlockHash)
                 )
             {
