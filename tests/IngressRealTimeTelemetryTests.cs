@@ -219,7 +219,7 @@ namespace tests
                     NodeId = "node-3",
                     Payload = new RealTimeTelemetryPayload
                     {
-                        Client = "'Parityv123'",
+                        Client = "Parity v123",
                         BlockNum = 123456,
                         BlockHash = "123efd",
                         BlockTS = 1465839830100400200,
@@ -227,7 +227,7 @@ namespace tests
                         NumPeers = 12,
                         NumTxInBlock = 23
                     },
-                    Signature = "kVfVyaGWkGyVMVyQCpX4knbjz2p6JRADNAi0lI8lvhUhS9ESfn7jm3a35ul1sjIRg1K9lOTEVL+HonfBjjqebJHdwAHvjzBiO6JARpgi6f0iLUvcCGflVZIb5fX7CfwT6Eb5kP+NThKXH3SV0zSYbHzhxX8EjyCi0fkRFpCkQmo="
+                    Signature = "QOD39fI8tDDLL12Qm0Ial0uQzEiz8sRjSir69XQAy2x7tA1RH4otozyYNSTfZAAjcpZG++nXuMC2SJgkH97O3E+MEV5Wm2BsoFKklE7WeRty07UOrI0VK8P+anE6iHhWBvVIB3NSjF+mIwFXsGhsGcz1tBdZifjlzYdk2kdcdeE="
                 });
 
             Assert.NotNull(webResponse);
@@ -253,5 +253,6 @@ namespace tests
             Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
             Assert.Equal(0, influxLib.LastInsertCount);
         }
+        
     }
 }

@@ -75,21 +75,18 @@ namespace webapi.Controllers
                 return StatusCode(403);
             }
 
-            try
+            Console.WriteLine($"Accepted telemetry from {telemetryPackage.NodeId} [{telemetryPackage.Payload.Count} metrics]");
+            // Signature valid - record to db
+            if (_influx.Enqueue(telemetryPackage.Payload, true))
             {
-
-                Console.WriteLine($"Accepted telemetry from {telemetryPackage.NodeId} [{telemetryPackage.Payload.Count} metrics]");
-                // Signature valid - record to db
-                _influx.Enqueue(telemetryPackage.Payload, true);
+                return Accepted();
             }
-            catch (Exception ex)
+            else
             {
-
-                Console.WriteLine("ERROR: Unable to enqueue: {0}", ex.ToString());
                 return StatusCode(400);
             }
 
-            return Accepted();
+
         }
 
 
@@ -107,16 +104,12 @@ namespace webapi.Controllers
             if (realTimePackage?.NodeId == null ||
                 string.IsNullOrWhiteSpace(realTimePackage.Signature) ||
                 realTimePackage.Payload == null ||
-                string.IsNullOrWhiteSpace(realTimePackage.Payload.Client) ||
-                realTimePackage.Payload?.BlockNum == null || realTimePackage.Payload?.BlockNum < 0 ||
-                string.IsNullOrWhiteSpace(realTimePackage.Payload.BlockHash) ||
-                realTimePackage.Payload?.BlockTS == null ||
-                realTimePackage.Payload?.BlockReceived == null ||
-                realTimePackage.Payload?.NumPeers == null || realTimePackage.Payload?.NumPeers < 0 ||
-                realTimePackage.Payload?.NumTxInBlock == null || realTimePackage.Payload?.NumTxInBlock < 0
+                string.IsNullOrWhiteSpace(realTimePackage.Payload.Client) || 
+                realTimePackage.Payload.BlockNum <= 0 ||
+                string.IsNullOrWhiteSpace(realTimePackage.Payload.BlockHash)
                 )
             {
-                Console.WriteLine("Bad Request");
+                Console.WriteLine("Bad Request: " + JsonConvert.SerializeObject(realTimePackage,Formatting.Indented) );
                 return BadRequest();
             }
 
@@ -142,33 +135,35 @@ namespace webapi.Controllers
                 return StatusCode(403);
             }
 
-            try
+
+            //Point format |measurement|,tag_set| |field_set| |timestamp|
+
+            //create a point from incoming JSON
+            Console.WriteLine($"Accepted RT telemetry from {realTimePackage.NodeId} ");
+            long nanotimestamp = (long) (realTimePackage.Payload.BlockReceived * 1e9);
+            string influxPoint = string.Format("parity,nodeid={0},client={1} blocknum={2},numpeers={3},blockts={4},numtxinblock={5},propagationtime={6},gaslimit={8},gasused={9} {7}",
+                    realTimePackage.NodeId,
+                    realTimePackage.Payload.Client,
+                    realTimePackage.Payload.BlockNum,
+                    realTimePackage.Payload.NumPeers,
+                    realTimePackage.Payload.BlockTS,
+                    realTimePackage.Payload.NumTxInBlock,
+                    (realTimePackage.Payload.BlockReceived - realTimePackage.Payload.BlockTS),
+                    nanotimestamp,
+                    realTimePackage.Payload.GasLimit,
+                    realTimePackage.Payload.GasUsed);
+
+            // Signature valid - record to db
+            if (_influx.Enqueue(influxPoint, true))
             {
-                //Point format |measurement|,tag_set| |field_set| |timestamp|
-
-                //create a point from incoming JSON
-                Console.WriteLine($"Accepted RT telemetry from {realTimePackage.NodeId} ");
-                string influxPoint = string.Format("parity,nodeid={0},client={1} blocknum={2},numpeers={3},blockts={4},numtxinblock={5},propagationtime={6} {7}",
-                        realTimePackage.NodeId,
-                        realTimePackage.Payload.Client,
-                        realTimePackage.Payload.BlockNum,
-                        realTimePackage.Payload.NumPeers,
-                        realTimePackage.Payload.BlockTS,
-                        realTimePackage.Payload.NumTxInBlock,
-                        (realTimePackage.Payload.BlockReceived - realTimePackage.Payload.BlockTS),
-                        realTimePackage.Payload.BlockReceived);
-
-                // Signature valid - record to db
-                _influx.Enqueue(influxPoint, true);
+                return Accepted();
             }
-            catch (Exception ex)
+            else
             {
-
-                Console.WriteLine("ERROR: unable to enqueue RTT: {0}", ex.ToString());
                 return StatusCode(400);
             }
 
-            return Accepted();
+
         }
 
     }

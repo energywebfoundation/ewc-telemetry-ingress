@@ -72,5 +72,17 @@ namespace webapi
         /// </summary>
         [JsonProperty("numtxinblock")]
         public ushort NumTxInBlock { get; set; }
+        
+        /// <summary>
+        /// Gaslimit of the block
+        /// </summary>
+        [JsonProperty("gaslimit")]
+        public long GasLimit { get; set; }
+
+        /// <summary>
+        /// Amount of gas used inside the block
+        /// </summary>
+        [JsonProperty("gasused")]
+        public long GasUsed { get; set; }
     }
 }
