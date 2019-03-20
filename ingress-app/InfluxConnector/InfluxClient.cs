@@ -183,7 +183,7 @@ namespace webapi.Controllers
             }
             
             //Enqueue reports false when all lines did not verify 
-            return badLines == pointsList.Count;
+            return badLines != pointsList.Count;
         }
 
         /// <summary>
