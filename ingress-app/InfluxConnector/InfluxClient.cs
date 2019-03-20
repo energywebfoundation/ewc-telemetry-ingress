@@ -161,6 +161,8 @@ namespace webapi.Controllers
             // Enqueue method for putting data into buffer, workerQueue is flag for putting data into worker or failure handler buffers
             ISubject<string> sub = workerQueue ? _synSubject : _synSubjectSecondQueue;
 
+            int badLines = 0;
+
             //iterates on incoming list and push data in buffer
             foreach (var point in pointsList)
             {
@@ -176,10 +178,12 @@ namespace webapi.Controllers
                 {
                     Console.WriteLine("Error Occurred for Point Enqueue call:{0}", point);
                     Console.WriteLine(ex.ToString());
-                    return false;
+                    badLines++;
                 }
             }
-            return true;
+            
+            //Enqueue reports false when all lines did not verify 
+            return badLines == pointsList.Count;
         }
 
         /// <summary>
