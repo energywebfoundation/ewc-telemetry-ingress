@@ -39,10 +39,10 @@ namespace tests
             ActionResult webResponse = tc.PostInfluxTelemetry(new InfluxTelemetry
             {
                 NodeId = "node-3",
-                Signature = "fHYfz0RKGI9xpGBX0v4nbBBoZvyryZbrRTp08wPFcMw9y5VUS6lrNrKaXNfaW0V3vb88iD4as/cBbvNKMDxrq0Hq1wcx9ceIkH3abuCCCBJWwHaLCIqJ1ZBgVcLP8VDjpxzvJ9m6fiTTYjQleGTGzaoGziH/buvW9NOIPHzqrNg=",
+                Signature = "h9tYfyqrRjq5yrx/7G9zyFHA5YHxr3gUondveKxLhNJevbyj5ozVOoKU2U7VCdHnm2WwO+Jr0fl2xuVqAt1DItIqbZX+7phDufMLown0DgqnzY0YLfW8pEt7xVop9CkGuqXTRZoGzpUiFidqtonwRB9uJXR/x9O3YQheoZ/Wz00=",
                 Payload = new List<string>
                 {
-                    "invalid pointw"
+                    "weather,location=us-midwest another key=another value temperature=82 1465839830100400200"
                 }
             });
             

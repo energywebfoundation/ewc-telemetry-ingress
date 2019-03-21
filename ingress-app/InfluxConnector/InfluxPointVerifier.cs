@@ -18,7 +18,7 @@ namespace webapi.Controllers
         /// <exception cref="System.Exception">Thrown when provided point have invalid measurement or tag or field or timestamp.</exception>
         public static bool verifyPoint(string point)
         {
-            string[] tokens = Regex.Split(point, @"(?<!($|[^\\])(\\\\)*?\\) ");
+            string[] tokens = splitString(point,' ');
 
             // invalid Point there must be at least measurement and fieldset seperated by a space, or there must not be tokens other then (measurementtagset fieldset timestamp)
             if (tokens.Length < 2 || tokens.Length > 3)
@@ -27,7 +27,7 @@ namespace webapi.Controllers
             }
 
             // getting measurement and Tags Set
-            string[] measurementAndTagSet = Regex.Split(tokens[0], @"(?<!($|[^\\])(\\\\)*?\\),");
+            string[] measurementAndTagSet = splitString(tokens[0], ',');
 
             //check for unescaped special chars
             //measurement name should be valid string
@@ -42,7 +42,7 @@ namespace webapi.Controllers
                 for (int i = 1; i < measurementAndTagSet.Length; i++)
                 {
 
-                    string[] tagKeyValue = Regex.Split(measurementAndTagSet[i], @"(?<!($|[^\\])(\\\\)*?\\)="); 
+                    string[] tagKeyValue = splitString(measurementAndTagSet[i], '=');
 
                     //verifying tags individually
                     if (tagKeyValue.Length != 2 ||
@@ -54,11 +54,11 @@ namespace webapi.Controllers
             }
 
             //Field set validation, at least 1 field set is mandatory
-            string[] fieldSet =  Regex.Split(tokens[1], @"(?<!($|[^\\])(\\\\)*?\\),"); 
+            string[] fieldSet = splitString(tokens[1], ',');
             foreach (string field in fieldSet)
             {
 
-                string[] fieldKeyValue = Regex.Split(field, @"(?<!($|[^\\])(\\\\)*?\\)="); 
+                string[] fieldKeyValue = splitString(field, '=');
 
                 //Validation of fields individually
                 if (fieldKeyValue.Length != 2 ||
@@ -82,6 +82,43 @@ namespace webapi.Controllers
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Method for spliting string based on provided char while ignoring if it is escaped or if it is in sub string with ""
+        /// </summary>
+        /// <param name="data">String to be split.</param>
+        /// <param name="splitChar">The spliting char.</param>
+        /// <returns>returns true if provided point is a valid Influx data point and false if it is invalid</returns>
+        /// <exception cref="System.Exception">Thrown when provided point have invalid measurement or tag or field or timestamp.</exception>
+        private static string[] splitString(string data, char splitChar)
+        {
+            string tmpData = data;
+            string strRegex = @"[" + splitChar + @"](?=(?:[^""]*""[^""]*"")*[^""]*$)";
+            Regex myRegex = new Regex(strRegex, RegexOptions.Multiline);
+
+            string[] res = myRegex.Split(data);
+            string randomStr = "QWE345AC!@#$XSQWE345AC";
+
+            foreach (string s in res)
+            {
+                if (s.Contains(splitChar))
+                {
+                    string ns = s.Replace("" + splitChar, randomStr);
+                    tmpData = tmpData.Replace(s, ns);
+                }
+            }
+            string[] results = Regex.Split(tmpData, @"(?<!($|[^\\])(\\\\)*?\\)" + splitChar);
+
+            for (int i = 0; i < results.Length; i++)
+            {
+                if (results[i].Contains(randomStr))
+                {
+                    results[i] = results[i].Replace(randomStr, "" + splitChar);
+                }
+                
+            }
+            return results;
         }
     }
 }
