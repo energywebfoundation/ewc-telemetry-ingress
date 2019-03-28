@@ -9,7 +9,7 @@ namespace webapi
     /// <summary>
     /// Class having functionality of verifying that a given payload was signed with the correct key
     /// </summary>
-    public class SignatureVerifier
+    public static class SignatureVerifier
     {
 
         /// <summary>

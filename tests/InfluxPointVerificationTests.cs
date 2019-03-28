@@ -16,8 +16,8 @@ namespace tests
         [InlineData("parity,nodeid=0x00000000000000000000000,client=\"Parity 123\" blocknum=123456,address=\"city=abc,country=def\",numpeers=12,blockts=1465839830100400200,numtxinblock=23,propagationtime=0 1465839830100400200")]
         public void ShouldPassValidPoint(string point)
         {
-            bool result = InfluxPointVerifier.verifyPoint(point);
-            Assert.Equal(result, true);
+            bool result = InfluxPointVerifier.VerifyPoint(point);
+            Assert.Equal(true, result);
         }
 
 
@@ -27,9 +27,9 @@ namespace tests
             string point = ",nodeid=0x00000000000000000000000,client=Parityv123 blocknum=123456,numpeers=12,blockts=1465839830100400200,numtxinblock=23,propagationtime=0 1465839830100400200";
 
             //Assert.Throws<Exception>(() => InfluxPointVerifier.verifyPoint(point));
-            var exception = Assert.Throws<Exception>(() => InfluxPointVerifier.verifyPoint(point));
+            var exception = Assert.Throws<Exception>(() => InfluxPointVerifier.VerifyPoint(point));
             Assert.NotNull(exception);
-            Assert.True(exception.Message.ToString().Contains("Measurement name should be valid string"));
+            Assert.Contains("Measurement name should be valid string", exception.Message.ToString());
 
         }
 
@@ -39,9 +39,9 @@ namespace tests
             string point = "parity,nodeid=0x00000000000000000000000,clientParityv123 blocknum=123456,numpeers=12,blockts=1465839830100400200,numtxinblock=23,propagationtime=0 1465839830100400200";
 
             //Assert.Throws<Exception>(() => InfluxPointVerifier.verifyPoint(point));
-            var exception = Assert.Throws<Exception>(() => InfluxPointVerifier.verifyPoint(point));
+            var exception = Assert.Throws<Exception>(() => InfluxPointVerifier.VerifyPoint(point));
             Assert.NotNull(exception);
-            Assert.True(exception.Message.Contains("Invalid Tag (key or value)"));
+            Assert.Contains("Invalid Tag (key or value)", exception.Message);
 
         }
 
@@ -51,10 +51,10 @@ namespace tests
             string point = "parity,nodeid=0x00000000000000000000000,client=Parityv123 blocknum=123456numpeers=12,blockts=1465839830100400200,numtxinblock=23,propagationtime=0 1465839830100400200";
 
             //Assert.Throws<Exception>(() => InfluxPointVerifier.verifyPoint(point));
-            var exception = Assert.Throws<Exception>(() => InfluxPointVerifier.verifyPoint(point));
+            var exception = Assert.Throws<Exception>(() => InfluxPointVerifier.VerifyPoint(point));
             Assert.NotNull(exception);
 
-            Assert.True(exception.Message.Contains("Invalid Field (key or value)"));
+            Assert.Contains("Invalid Field (key or value)", exception.Message);
 
         }
 
@@ -64,9 +64,9 @@ namespace tests
             string point = "parity,nodeid=0x00000000000000000000000,client=Parityv123 blocknum=123456,numpeers=12,blockts=1465839830100400200,numtxinblock=23,propagationtime=0 1465839ert830100400200";
 
             //Assert.Throws<Exception>(() => InfluxPointVerifier.verifyPoint(point));
-            var exception = Assert.Throws<Exception>(() => InfluxPointVerifier.verifyPoint(point));
+            var exception = Assert.Throws<Exception>(() => InfluxPointVerifier.VerifyPoint(point));
             Assert.NotNull(exception);
-            Assert.True(exception.Message.Contains("Invalid timestamp"));
+            Assert.Contains("Invalid timestamp", exception.Message);
 
         }
 
@@ -75,8 +75,8 @@ namespace tests
         {
             string point = "parity blocknum=123456,numpeers=12,blockts=1465839830100400200,numtxinblock=23,propagationtime=0 1465839830100400200";
 
-            bool result = InfluxPointVerifier.verifyPoint(point);
-            Assert.Equal(result, true);
+            bool result = InfluxPointVerifier.VerifyPoint(point);
+            Assert.Equal(true, result);
 
         }
 
@@ -85,8 +85,8 @@ namespace tests
         {
             string point = "parity,nodeid=0x000000000000000000 blocknum=123456,numpeers=12,blockts=1465839830100400200,numtxinblock=23,propagationtime=0";
 
-            bool result = InfluxPointVerifier.verifyPoint(point);
-            Assert.Equal(result, true);
+            bool result = InfluxPointVerifier.VerifyPoint(point);
+            Assert.Equal(true, result);
 
         }
 
@@ -95,8 +95,8 @@ namespace tests
         {
             string point = "parity blocknum=123456,numpeers=12,blockts=1465839830100400200,numtxinblock=23,propagationtime=0";
 
-            bool result = InfluxPointVerifier.verifyPoint(point);
-            Assert.Equal(result, true);
+            bool result = InfluxPointVerifier.VerifyPoint(point);
+            Assert.Equal(true, result);
 
         }
 
@@ -105,9 +105,9 @@ namespace tests
         {
             string point = "";
 
-            var exception = Assert.Throws<Exception>(() => InfluxPointVerifier.verifyPoint(point));
+            var exception = Assert.Throws<Exception>(() => InfluxPointVerifier.VerifyPoint(point));
             Assert.NotNull(exception);
-            Assert.True(exception.Message.Contains("Invalid Point there must be at least measurement and fieldset seperated by a space, or there must not be tokens other then (measurementtagset fieldset timestamp)"));
+            Assert.Contains("Invalid Point there must be at least measurement and fieldset seperated by a space, or there must not be tokens other then (measurementtagset fieldset timestamp)", exception.Message);
 
         }
 

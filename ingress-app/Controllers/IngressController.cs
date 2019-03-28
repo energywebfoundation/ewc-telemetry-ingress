@@ -104,8 +104,7 @@ namespace webapi.Controllers
             if (realTimePackage?.NodeId == null ||
                 string.IsNullOrWhiteSpace(realTimePackage.Signature) ||
                 realTimePackage.Payload == null ||
-                string.IsNullOrWhiteSpace(realTimePackage.Payload.Client) || 
-                realTimePackage.Payload.BlockNum < 0 ||
+                string.IsNullOrWhiteSpace(realTimePackage.Payload.Client) ||
                 string.IsNullOrWhiteSpace(realTimePackage.Payload.BlockHash)
                 )
             {

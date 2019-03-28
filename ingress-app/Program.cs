@@ -44,21 +44,12 @@ namespace webapi
             string keyCommandMode = config.GetValue<string>("keycmd", String.Empty);
             if (!String.IsNullOrWhiteSpace(keyCommandMode))
             {
-                // TODO: Keystore not taken from singleton as this happens later on
                 var keystore = JsonPublicKeySource.FromFile(
                     Path.Combine(config.GetValue<string>("INTERNAL_DIR", "./"), "keyfile.json"), true);
 
                 var keymgr = new KeyManagement(config, keystore);
                 keymgr.ProcessKeyCommand(keyCommandMode);
                 return;
-            }
-
-
-            // print config
-            // TODO: remove after done
-            foreach (var c in config.AsEnumerable())
-            {
-                Console.WriteLine($"{c.Key} ==> {c.Value}");
             }
 
             //Getting certificate path for SSL

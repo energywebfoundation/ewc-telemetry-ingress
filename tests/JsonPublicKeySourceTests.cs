@@ -10,12 +10,12 @@ namespace tests
     public class JsonPublicKeySourceTests
     {
 
-        private static Random random = new Random();
+        private static Random _random = new Random();
         public static string RandomString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             return new string(Enumerable.Repeat(chars, length)
-              .Select(s => s[random.Next(s.Length)]).ToArray());
+              .Select(s => s[_random.Next(s.Length)]).ToArray());
         }
 
         [Fact]
@@ -26,7 +26,7 @@ namespace tests
             var exception = Assert.Throws<ArgumentNullException>(() => obj.LoadFromFile(""));
             Assert.NotNull(exception);
 
-            Assert.True(exception.Message.Contains("path can't be null or empty"));
+            Assert.Contains("path can't be null or empty", exception.Message);
         }
 
         [Fact]
@@ -37,7 +37,7 @@ namespace tests
             var exception = Assert.Throws<ArgumentException>(() => obj.LoadFromFile("\\etc\\file.json"));
             Assert.NotNull(exception);
 
-            Assert.True(exception.Message.Contains("No file at path: "));
+            Assert.Contains("No file at path: ", exception.Message);
         }
 
         [Fact]
@@ -64,7 +64,7 @@ namespace tests
             var exception = Assert.Throws<FileEmptyException>(() => obj.LoadFromFile(randFileName));
             Assert.NotNull(exception);
 
-            Assert.True(exception.Message.Contains("is empty"));
+            Assert.Contains("is empty", exception.Message);
 
             //removing temp file
             File.Delete(randFileName);
@@ -81,7 +81,7 @@ namespace tests
             var exception = Assert.Throws<KeyLoadException>(() => obj.LoadFromFile(randFileName));
             Assert.NotNull(exception);
 
-            Assert.True(exception.Message.Contains("Unable to load keys from json"));
+            Assert.Contains("Unable to load keys from json", exception.Message);
 
             //removing temp file
             File.Delete(randFileName);
@@ -98,7 +98,7 @@ namespace tests
             var exception = Assert.Throws<KeyLoadException>(() => obj.LoadFromFile(randFileName));
             Assert.NotNull(exception);
 
-            Assert.True(exception.Message.Contains("JSON contains no keys"));
+            Assert.Contains("JSON contains no keys", exception.Message);
 
             //removing temp file
             File.Delete(randFileName);
@@ -110,9 +110,9 @@ namespace tests
         {
             JsonPublicKeySource obj = new JsonPublicKeySource();
 
-            var exceptionSTF = Assert.Throws<Exception>(() => obj.SaveToFile());
-            Assert.NotNull(exceptionSTF);
-            Assert.True(exceptionSTF.Message.Contains("Not loaded from file."));
+            var exceptionStf = Assert.Throws<Exception>(() => obj.SaveToFile());
+            Assert.NotNull(exceptionStf);
+            Assert.Contains("Not loaded from file.", exceptionStf.Message);
         }
 
         [Fact]
@@ -125,9 +125,9 @@ namespace tests
             File.Delete(randFileName);
 
 
-            var exceptionSTF = Assert.Throws<FileNotFoundException>(() => obj.SaveToFile());
-            Assert.NotNull(exceptionSTF);
-            Assert.True(exceptionSTF.Message.Contains("Source file no longer exists."));
+            var exceptionStf = Assert.Throws<FileNotFoundException>(() => obj.SaveToFile());
+            Assert.NotNull(exceptionStf);
+            Assert.Contains("Source file no longer exists.", exceptionStf.Message);
         }
 
         [Fact]
@@ -142,7 +142,7 @@ namespace tests
 
             var exception = Assert.Throws<KeyNotFoundException>(() => obj.GetKeyForNode("Node-12"));
             Assert.NotNull(exception);
-            Assert.True(exception.Message.Contains("Public key not available"));
+            Assert.Contains("Public key not available", exception.Message);
 
             //removing temp file
             File.Delete(randFileName);
@@ -159,7 +159,7 @@ namespace tests
             obj.LoadFromFile(randFileName, true);
 
             string key = obj.GetKeyForNode("node-12");
-            Assert.Equal(key, "BgIA345nlikrwegfSDFG=");
+            Assert.Equal("BgIA345nlikrwegfSDFG=", key);
 
             //removing temp file
             File.Delete(randFileName);
@@ -194,7 +194,7 @@ namespace tests
             //verifying that key is removed
             var exception = Assert.Throws<KeyNotFoundException>(() => obj.RemoveKey(nodeId2));
             Assert.NotNull(exception);
-            Assert.True(exception.Message.Contains("Node key is not known"));
+            Assert.Contains("Node key is not known", exception.Message);
 
             //removing temp file
             File.Delete(randFileName);
@@ -209,14 +209,12 @@ namespace tests
             IPublickeySource obj = JsonPublicKeySource.FromFile(randFileName, false);
 
             string key = obj.GetKeyForNode("node-3");
-            Assert.Equal(key, "BdrwegfSDFG=");
+            Assert.Equal("BdrwegfSDFG=", key);
 
             //removing temp file
             File.Delete(randFileName);
 
         }
-
-
 
     }
 }

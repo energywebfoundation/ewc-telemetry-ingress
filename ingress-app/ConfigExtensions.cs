@@ -18,7 +18,7 @@ namespace webapi
         public static IConfigurationBuilder AddInfluxConfigFromEnvironment(this IConfigurationBuilder configBuilder)
         {
             //Setting ENV variables into dictionary with following keys
-            var dict = new Dictionary<string, string>();
+            Dictionary<string, string> dict = new Dictionary<string, string>();
             string user = Environment.GetEnvironmentVariable("TELEMETRY_INFLUXDB_USER"); if (!string.IsNullOrEmpty(user))
             {
                 dict.Add("Influx:User", user);

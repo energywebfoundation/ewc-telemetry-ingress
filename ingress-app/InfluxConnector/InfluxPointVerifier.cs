@@ -6,7 +6,7 @@ namespace webapi.Controllers
     /// <summary>
     /// The Class for Influx data points verification.
     /// </summary>
-    public class InfluxPointVerifier
+    public static class InfluxPointVerifier
     {
 
         /// <summary>
@@ -16,9 +16,9 @@ namespace webapi.Controllers
         /// <param name="point">The Influx Point to be checked.</param>
         /// <returns>returns true if provided point is a valid Influx data point and false if it is invalid</returns>
         /// <exception cref="System.Exception">Thrown when provided point have invalid measurement or tag or field or timestamp.</exception>
-        public static bool verifyPoint(string point)
+        public static bool VerifyPoint(string point)
         {
-            string[] tokens = splitString(point,' ');
+            string[] tokens = SplitString(point,' ');
 
             // invalid Point there must be at least measurement and fieldset seperated by a space, or there must not be tokens other then (measurementtagset fieldset timestamp)
             if (tokens.Length < 2 || tokens.Length > 3)
@@ -27,7 +27,7 @@ namespace webapi.Controllers
             }
 
             // getting measurement and Tags Set
-            string[] measurementAndTagSet = splitString(tokens[0], ',');
+            string[] measurementAndTagSet = SplitString(tokens[0], ',');
 
             //check for unescaped special chars
             //measurement name should be valid string
@@ -42,7 +42,7 @@ namespace webapi.Controllers
                 for (int i = 1; i < measurementAndTagSet.Length; i++)
                 {
 
-                    string[] tagKeyValue = splitString(measurementAndTagSet[i], '=');
+                    string[] tagKeyValue = SplitString(measurementAndTagSet[i], '=');
 
                     //verifying tags individually
                     if (tagKeyValue.Length != 2 ||
@@ -54,11 +54,11 @@ namespace webapi.Controllers
             }
 
             //Field set validation, at least 1 field set is mandatory
-            string[] fieldSet = splitString(tokens[1], ',');
+            string[] fieldSet = SplitString(tokens[1], ',');
             foreach (string field in fieldSet)
             {
 
-                string[] fieldKeyValue = splitString(field, '=');
+                string[] fieldKeyValue = SplitString(field, '=');
 
                 //Validation of fields individually
                 if (fieldKeyValue.Length != 2 ||
@@ -71,9 +71,8 @@ namespace webapi.Controllers
             //Time stamp validation, time stamp is optional
             if (tokens.Length == 3)
             {
-                long holder = 0;
                 //Check for invalid timestamp
-                bool result = System.Int64.TryParse(tokens[2], out holder);
+                bool result = long.TryParse(tokens[2], out _);
                 if (!result)
                 {
                     throw new Exception("Invalid timestamp " + tokens[2] + " in Point:" + point);
@@ -91,7 +90,7 @@ namespace webapi.Controllers
         /// <param name="splitChar">The spliting char.</param>
         /// <returns>returns true if provided point is a valid Influx data point and false if it is invalid</returns>
         /// <exception cref="System.Exception">Thrown when provided point have invalid measurement or tag or field or timestamp.</exception>
-        private static string[] splitString(string data, char splitChar)
+        private static string[] SplitString(string data, char splitChar)
         {
             string tmpData = data;
             string strRegex = @"[" + splitChar + @"](?=(?:[^""]*""[^""]*"")*[^""]*$)";

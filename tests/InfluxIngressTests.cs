@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,15 +15,6 @@ namespace tests
 {
  public class InfluxIngressTests
     {
-
-        public static string InfluxCon(LineProtocolConnectionParameters conobj)
-        {
-            var client = new WebClient();
-            var queryString = Uri.EscapeUriString("db=" + Uri.EscapeDataString(conobj.DBName) + "&q=SELECT * FROM \"weather\"");
-            var queryUrl = conobj.Address + "query?" + queryString;
-            return client.DownloadString(queryUrl);
-        }
-
         [Fact]
         public void EnqueueShouldFailForInvalidPoint()
         {

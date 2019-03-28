@@ -14,9 +14,8 @@ namespace tests
             JsonPublicNodeKey obj = new JsonPublicNodeKey { NodeId = nodeId, PublicKey = pubKey };
 
             Assert.NotNull(obj);
-            Assert.NotNull(obj.NodeId == nodeId);
-            Assert.NotNull(obj.PublicKey == pubKey);
-
+            Assert.Equal(nodeId, obj.NodeId);
+            Assert.Equal(pubKey, obj.PublicKey);
         }
     }
 }

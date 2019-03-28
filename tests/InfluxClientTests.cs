@@ -53,8 +53,8 @@ namespace tests
 
             JObject pobj = JObject.Parse(InfluxCon(conobj, "SELECT * FROM \"datameasurement\""));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
-            var in_count = rows.Children().Count();
-            Assert.Equal(2, in_count);//Check if row count is now 2
+            var inCount = rows.Children().Count();
+            Assert.Equal(2, inCount);//Check if row count is now 2
 
         }
 
@@ -84,8 +84,8 @@ namespace tests
 
             JObject pobj = JObject.Parse(InfluxCon(conobj, "SELECT * FROM \"datameasurementA\""));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
-            var in_count = rows.Children().Count();
-            Assert.Equal(0, in_count);//Check if row count is now 0
+            var inCount = rows.Children().Count();
+            Assert.Equal(0, inCount);//Check if row count is now 0
 
         }
 
@@ -107,8 +107,8 @@ namespace tests
 
             JObject pobj = JObject.Parse(InfluxCon(conobj, "SELECT * FROM \"datameasurementB\""));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
-            var in_count = rows.Children().Count();
-            Assert.Equal(1, in_count);//Check if row count is now 1
+            var inCount = rows.Children().Count();
+            Assert.Equal(1, inCount);//Check if row count is now 1
 
         }
 
@@ -128,8 +128,8 @@ namespace tests
 
             JObject pobj = JObject.Parse(InfluxCon(conobj, "SELECT * FROM \"datameasurementC\""));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
-            var in_count = rows.Children().Count();
-            Assert.Equal(0, in_count);//Check if row count is now 0
+            var inCount = rows.Children().Count();
+            Assert.Equal(0, inCount);//Check if row count is now 0
 
         }
 
@@ -162,8 +162,8 @@ namespace tests
 
             JObject pobj = JObject.Parse(InfluxCon(conobjBufferA, "SELECT * FROM \"datameasurementD\""));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
-            var in_count = rows.Children().Count();
-            Assert.Equal((notFlushBeforeTimeInterval ? 0 : 2), in_count);//Check if row count is now 2
+            var inCount = rows.Children().Count();
+            Assert.Equal((notFlushBeforeTimeInterval ? 0 : 2), inCount);//Check if row count is now 2
 
         }
 
@@ -196,8 +196,8 @@ namespace tests
 
             JObject pobj = JObject.Parse(InfluxCon(conobjBufferA, "SELECT * FROM \"datameasurementE\""));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
-            var in_count = rows.Children().Count();
-            Assert.Equal(3, in_count);//Check if row count is now 4
+            var inCount = rows.Children().Count();
+            Assert.Equal(3, inCount);//Check if row count is now 4
         }
 
         [Fact]
@@ -227,8 +227,8 @@ namespace tests
 
             JObject pobj = JObject.Parse(InfluxCon(conobjBufferA, "SELECT * FROM \"datameasurementE\""));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
-            var in_count = rows.Children().Count();
-            Assert.Equal(0, in_count);//Check if row count is now 4
+            var inCount = rows.Children().Count();
+            Assert.Equal(0, inCount);//Check if row count is now 4
         }
 
         [Fact]

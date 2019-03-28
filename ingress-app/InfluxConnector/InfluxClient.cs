@@ -169,7 +169,7 @@ namespace webapi.Controllers
                 //Verify Influx Point, if it is invalid log exception and drop that point
                 try
                 {
-                    if (InfluxPointVerifier.verifyPoint(point))
+                    if (InfluxPointVerifier.VerifyPoint(point))
                     {
                         sub.OnNext(point);
                     }
@@ -199,7 +199,7 @@ namespace webapi.Controllers
             //Verify Influx Point, if it is invalid just ignore that
             try
             {
-                if (InfluxPointVerifier.verifyPoint(point))
+                if (InfluxPointVerifier.VerifyPoint(point))
                 {
                     sub.OnNext(point);
                 }
@@ -220,19 +220,17 @@ namespace webapi.Controllers
         protected virtual void Dispose(bool disposing)
         {
             //dispose allocated resources
-            if (!_disposedValue)
+            if (_disposedValue) return;
+            if (disposing)
             {
-                if (disposing)
-                {
-                    _httpClient?.Dispose();
-                    _httpClientHandler?.Dispose();
-                    _subscription?.Dispose();
-                    _subscriptionSecondQueue?.Dispose();
+                _httpClient?.Dispose();
+                _httpClientHandler?.Dispose();
+                _subscription?.Dispose();
+                _subscriptionSecondQueue?.Dispose();
 
-                }
-
-                _disposedValue = true;
             }
+
+            _disposedValue = true;
         }
 
         /// <summary>
