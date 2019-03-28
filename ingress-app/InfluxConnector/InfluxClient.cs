@@ -156,18 +156,34 @@ namespace webapi.Controllers
         /// </summary>
         /// <param name="pointsList">The List of Influx points</param>
         /// <param name="workerQueue">The Flag for indication if provided points should be enqueued into worker buffer or failure handler buffer</param>
-        public void Enqueue(IList<string> pointsList, bool workerQueue)
+        public bool Enqueue(IList<string> pointsList, bool workerQueue)
         {
             // Enqueue method for putting data into buffer, workerQueue is flag for putting data into worker or failure handler buffers
             ISubject<string> sub = workerQueue ? _synSubject : _synSubjectSecondQueue;
 
+            int badLines = 0;
+
             //iterates on incoming list and push data in buffer
             foreach (var point in pointsList)
             {
-                //Verify Influx Point, if it is invalid just ignore that
-                if (InfluxPointVerifier.verifyPoint(point))
-                    sub.OnNext(point);
+                //Verify Influx Point, if it is invalid log exception and drop that point
+                try
+                {
+                    if (InfluxPointVerifier.VerifyPoint(point))
+                    {
+                        sub.OnNext(point);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error Occurred for Point Enqueue call:{0}", point);
+                    Console.WriteLine(ex.ToString());
+                    badLines++;
+                }
             }
+            
+            //Enqueue reports false when all lines did not verify 
+            return badLines != pointsList.Count;
         }
 
         /// <summary>
@@ -175,14 +191,26 @@ namespace webapi.Controllers
         /// </summary>
         /// <param name="point">The single Influx point</param>
         /// <param name="workerQueue">The Flag for indication if provided points should be enqueued into worker buffer or failure handler buffer</param>
-        public void Enqueue(string point, bool workerQueue)
+        public bool Enqueue(string point, bool workerQueue)
         {
             // Enqueue method for putting data into buffer, workerQueue is flag for putting data into worker or failure handler buffers
             ISubject<string> sub = workerQueue ? _synSubject : _synSubjectSecondQueue;
 
             //Verify Influx Point, if it is invalid just ignore that
-            if (InfluxPointVerifier.verifyPoint(point))
-                sub.OnNext(point);
+            try
+            {
+                if (InfluxPointVerifier.VerifyPoint(point))
+                {
+                    sub.OnNext(point);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error Occurred for Point Enqueue call:{0}", point);
+                Console.WriteLine(ex.ToString());
+                return false;
+            }
+            return true;
         }
 
         /// <summary>
@@ -192,19 +220,17 @@ namespace webapi.Controllers
         protected virtual void Dispose(bool disposing)
         {
             //dispose allocated resources
-            if (!_disposedValue)
+            if (_disposedValue) return;
+            if (disposing)
             {
-                if (disposing)
-                {
-                    _httpClient?.Dispose();
-                    _httpClientHandler?.Dispose();
-                    _subscription?.Dispose();
-                    _subscriptionSecondQueue?.Dispose();
+                _httpClient?.Dispose();
+                _httpClientHandler?.Dispose();
+                _subscription?.Dispose();
+                _subscriptionSecondQueue?.Dispose();
 
-                }
-
-                _disposedValue = true;
             }
+
+            _disposedValue = true;
         }
 
         /// <summary>
