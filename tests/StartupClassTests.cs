@@ -10,7 +10,7 @@ namespace tests
     public class StartupClassTests
     {
         [Fact]
-        public void IConfigGetShouldPass()
+        public void ConfigGetShouldPass()
         {
 
             ConfigurationBuilder cb = new ConfigurationBuilder();
