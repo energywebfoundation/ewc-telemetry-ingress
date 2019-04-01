@@ -78,12 +78,12 @@ namespace webapi.Controllers
             Console.WriteLine($"Accepted telemetry from {telemetryPackage.NodeId} [{telemetryPackage.Payload.Count} metrics]");
             // Signature valid - record to db
             if (_influx.Enqueue(telemetryPackage.Payload, true))
-            {
-                return StatusCode(400);
+            {                
+                return Accepted();
             }
             else
             {
-                return Accepted();
+                return StatusCode(400);
             }
 
 
