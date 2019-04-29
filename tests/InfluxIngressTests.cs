@@ -1,15 +1,10 @@
 using System.Collections.Generic;
-using System.Net.Http;
+using System.Net;
+using System.Threading;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using webapi;
 using webapi.Controllers;
 using Xunit;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Net;
-using System.Linq;
 
 namespace tests
 {
@@ -114,7 +109,7 @@ namespace tests
             var result = Assert.IsType<AcceptedResult>(webResponse);
             Assert.Equal((int)HttpStatusCode.Accepted, result.StatusCode);
            
-            System.Threading.Thread.Sleep(conobj.FlushBufferSeconds * 1000 * 4); //wait for Queue to flush
+            Thread.Sleep(conobj.FlushBufferSeconds * 1000 * 4); //wait for Queue to flush
             Assert.Equal(2, influxLib.LastInsertCount);
 
             /*JObject pobj = JObject.Parse(InfluxCon(conobj));

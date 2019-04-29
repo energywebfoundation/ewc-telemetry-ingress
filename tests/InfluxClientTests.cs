@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using Newtonsoft.Json.Linq;
 using webapi;
 using webapi.Controllers;
@@ -48,7 +49,7 @@ namespace tests
 
             }
 
-            System.Threading.Thread.Sleep(1000); //wait for NW latency to Influx
+            Thread.Sleep(1000); //wait for NW latency to Influx
 
 
             JObject pobj = JObject.Parse(InfluxCon(conobj, "SELECT * FROM \"datameasurement\""));
@@ -102,7 +103,7 @@ namespace tests
 
             var influxLib = new InfluxClient(conobj);
             influxLib.Enqueue(data, true);
-            System.Threading.Thread.Sleep(2000); //wait for TIME flush & NW latency to Influx
+            Thread.Sleep(2000); //wait for TIME flush & NW latency to Influx
 
 
             JObject pobj = JObject.Parse(InfluxCon(conobj, "SELECT * FROM \"datameasurementB\""));
@@ -152,12 +153,12 @@ namespace tests
 
             var influxLib = new InfluxClient(conobjBufferA);
             influxLib.Enqueue(data, true);
-            System.Threading.Thread.Sleep(2000);
+            Thread.Sleep(2000);
             InfluxCon(conobjBufferA, "CREATE DATABASE \"" + conobjBufferA.DBName + "\"");
 
             if (!notFlushBeforeTimeInterval)
             {
-                System.Threading.Thread.Sleep((conobjBufferA.FlushSecondBufferSeconds + 1) * 1000); //wait for 2nd buffer to flush
+                Thread.Sleep((conobjBufferA.FlushSecondBufferSeconds + 1) * 1000); //wait for 2nd buffer to flush
             }
 
             JObject pobj = JObject.Parse(InfluxCon(conobjBufferA, "SELECT * FROM \"datameasurementD\""));
@@ -184,15 +185,15 @@ namespace tests
 
             var influxLib = new InfluxClient(conobjBufferA);
             influxLib.Enqueue(data, true);
-            System.Threading.Thread.Sleep(1000); //wait before flush call and db creation so flush dnt pass to influx but to 2nd buffer
+            Thread.Sleep(1000); //wait before flush call and db creation so flush dnt pass to influx but to 2nd buffer
             InfluxCon(conobjBufferA, "CREATE DATABASE \"" + conobjBufferA.DBName + "\"");
-            System.Threading.Thread.Sleep(2000); //wait for NW latency to Influx
+            Thread.Sleep(2000); //wait for NW latency to Influx
 
             //directly enqueue item in 2nd buffer to trigger flush
             influxLib.Enqueue("datameasurementE,location=us-east temperature=15 1465839830100400203", false);
 
 
-            System.Threading.Thread.Sleep(3000); //wait for 2nd buffer to flush
+            Thread.Sleep(3000); //wait for 2nd buffer to flush
 
             JObject pobj = JObject.Parse(InfluxCon(conobjBufferA, "SELECT * FROM \"datameasurementE\""));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
@@ -216,14 +217,14 @@ namespace tests
 
             var influxLib = new InfluxClient(conobjBufferA);
             influxLib.Enqueue(data, true);
-            System.Threading.Thread.Sleep(1000); //wait before flush call and db creation so flush dnt pass to influx but to 2nd buffer
+            Thread.Sleep(1000); //wait before flush call and db creation so flush dnt pass to influx but to 2nd buffer
             InfluxCon(conobjBufferA, "CREATE DATABASE \"" + conobjBufferA.DBName + "\"");
-            System.Threading.Thread.Sleep(2000); //wait for NW latency to Influx
+            Thread.Sleep(2000); //wait for NW latency to Influx
 
             influxLib.Enqueue("datameasurementE,location=us-east temperature=15 1465839830100400203", false);
 
 
-            System.Threading.Thread.Sleep(3000); //wait for 2nd buffer to flush
+            Thread.Sleep(3000); //wait for 2nd buffer to flush
 
             JObject pobj = JObject.Parse(InfluxCon(conobjBufferA, "SELECT * FROM \"datameasurementE\""));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");

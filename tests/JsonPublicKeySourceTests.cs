@@ -206,7 +206,7 @@ namespace tests
 
             string randFileName = RandomString(6) + ".json";
             File.WriteAllText(randFileName, "[ {\"nodeid\": \"node-3\",\"key\": \"BdrwegfSDFG=\"},{\"nodeid\": \"node-12\",\"key\": \"BgIA345nlikrwegfSDFG=\"}]");
-            IPublickeySource obj = JsonPublicKeySource.FromFile(randFileName, false);
+            IPublickeySource obj = JsonPublicKeySource.FromFile(randFileName);
 
             string key = obj.GetKeyForNode("node-3");
             Assert.Equal("BdrwegfSDFG=", key);
