@@ -25,10 +25,17 @@ test-dotnet:
     - influxdb
   script:
     - curl -i -XPOST http://influxdb:8086/query --data-urlencode "q=CREATE DATABASE telemetry"
+    - dotnet tool install -g trx2junit
+    - export PATH="$PATH:/root/.dotnet/tools"
     - dotnet restore
     - dotnet build
-    - dotnet test
-
+    - dotnet test --no-build -v=normal tests --logger "trx;LogFileName=TestResults.trx" /p:CollectCoverage=true /p:Exclude="[xunit.*]*"
+    - mv tests/TestResults/*.trx tests/TestResults/TestResults.trx
+    - trx2junit tests/TestResults/TestResults.trx
+  artifacts:
+    reports:
+      junit: tests/TestResults/TestResults.xml
+      
 package-docker:
   stage: package
   image: docker
