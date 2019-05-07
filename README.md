@@ -4,6 +4,8 @@ Receives telemetry from telemetry-signer and big sister of Apple Bloom
 
 ## Key management
 
+These commands are used to register/deregister nodes/signers from the ingress. Only signers that are registered are able to send telemetry - others will be rejected. 
+
 * Add key `dotnet run --keycmd add --validator <validatoraddress> --publickey <base64key>`
 * Remove key `dotnet run --keycmd add --validator <validatoraddress>`
 
