@@ -53,8 +53,8 @@ package-docker:
     - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME energyweb/telemetry-ingress:$CI_COMMIT_REF_NAME
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
     - docker push $CI_REGISTRY_IMAGE:latest
-    - echo "$SECRET_EWF_DOCKER" > ~/.docker/config.json
-    - docker push energyweb/telemetry-ingress:latest
-    - docker push energyweb/telemetry-ingress:$CI_COMMIT_REF_NAME
+    #- echo "$SECRET_EWF_DOCKER" > ~/.docker/config.json
+    #- docker push energyweb/telemetry-ingress:latest
+    #- docker push energyweb/telemetry-ingress:$CI_COMMIT_REF_NAME
 
 
