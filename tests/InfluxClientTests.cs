@@ -29,7 +29,7 @@ namespace tests
             var conobj = LineProtocolConfiguration.InitConfiguration();
             conobj.FlushBufferItemsSize = 2;
             conobj.FlushBufferSeconds = 30000;
-            InfluxCon(conobj, "DELETE FROM \"datameasurement\"");
+            InfluxCon(conobj, "DROP MEASUREMENT \"datameasurement\"");
 
             List<string> data = new List<string>();
             data.Add("datameasurement,location=us-midwest temperature=82 1465839830100400200");
@@ -67,7 +67,8 @@ namespace tests
             var conobj = LineProtocolConfiguration.InitConfiguration();
             conobj.FlushBufferItemsSize = 2;
             conobj.FlushBufferSeconds = 300;
-            InfluxCon(conobj, "DELETE FROM \"datameasurementA\"");
+            //InfluxCon(conobj, "DELETE FROM \"datameasurementA\"");
+            InfluxCon(conobj, "DROP MEASUREMENT \"datameasurementA\"");
 
             List<string> data = new List<string>();
             data.Add("datameasurementA,location=us-midwest temperature=82 1465839830100400200");
@@ -96,7 +97,8 @@ namespace tests
             var conobj = LineProtocolConfiguration.InitConfiguration();
             conobj.FlushBufferItemsSize = 100;
             conobj.FlushBufferSeconds = 1;
-            InfluxCon(conobj, "DELETE FROM \"datameasurementB\"");
+            //InfluxCon(conobj, "DELETE FROM \"datameasurementB\"");
+            InfluxCon(conobj, "DROP MEASUREMENT \"datameasurementB\"");
 
             List<string> data = new List<string>();
             data.Add("datameasurementB,location=us-midwest temperature=82 1465839830100400200");
@@ -119,7 +121,8 @@ namespace tests
             var conobj = LineProtocolConfiguration.InitConfiguration();
             conobj.FlushBufferItemsSize = 2000;
             conobj.FlushBufferSeconds = 300;
-            InfluxCon(conobj, "DELETE FROM \"datameasurementC\"");
+            //InfluxCon(conobj, "DELETE FROM \"datameasurementC\"");
+            InfluxCon(conobj, "DROP MEASUREMENT \"datameasurementC\"");
 
             List<string> data = new List<string>();
             data.Add("datameasurementC,location=us-midwest temperature=82 1465839830100400200");
@@ -144,7 +147,8 @@ namespace tests
             conobjBufferA.FlushBufferSeconds = 300;
             conobjBufferA.FlushSecondBufferSeconds = 5;
             conobjBufferA.FlushSecondBufferItemsSize = 5;
-            InfluxCon(conobjBufferA, "DELETE FROM \"datameasurementD\"");
+            //InfluxCon(conobjBufferA, "DELETE FROM \"datameasurementD\"");
+            InfluxCon(conobjBufferA, "DROP MEASUREMENT \"datameasurementD\"");
             InfluxCon(conobjBufferA, "DROP DATABASE \"" + conobjBufferA.DBName + "\""); // dropping db so first buffer fail
 
             List<string> data = new List<string>();
@@ -176,7 +180,7 @@ namespace tests
             conobjBufferA.FlushBufferSeconds = 300;
             conobjBufferA.FlushSecondBufferSeconds = 50;
             conobjBufferA.FlushSecondBufferItemsSize = 3;
-            InfluxCon(conobjBufferA, "DELETE FROM \"datameasurementE\"");
+            InfluxCon(conobjBufferA, "DROP MEASUREMENT \"datameasurementE\"");
             InfluxCon(conobjBufferA, "DROP DATABASE \"" + conobjBufferA.DBName + "\"");  // dropping db so first buffer fail
 
             List<string> data = new List<string>();
@@ -209,7 +213,7 @@ namespace tests
             conobjBufferA.FlushBufferSeconds = 300;
             conobjBufferA.FlushSecondBufferSeconds = 50;
             conobjBufferA.FlushSecondBufferItemsSize = 42;
-            InfluxCon(conobjBufferA, "DELETE FROM \"datameasurementE\"");
+            InfluxCon(conobjBufferA, "DROP MEASUREMENT \"datameasurementE\"");
             InfluxCon(conobjBufferA, "DROP DATABASE " + conobjBufferA.DBName);  // dropping db so first buffer fail
 
             List<string> data = new List<string>();

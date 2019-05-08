@@ -12,8 +12,8 @@ namespace tests
             { 
                 Address = new Uri("http://influxdb:8086"), 
                 DBName = "telemetry", 
-                User = "root", 
-                Password = "root", 
+                User = "", 
+                Password = "", 
                 FlushBufferItemsSize = 2, 
                 FlushBufferSeconds = 2, 
                 FlushSecondBufferItemsSize = 2, 
