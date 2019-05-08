@@ -1,4 +1,5 @@
 using System;
+using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using webapi;
 using Xunit;
@@ -25,17 +26,16 @@ namespace tests
             IConfigurationRoot configObj = cb.AddInfluxConfigFromEnvironment().Build();
 
             string usrVal = configObj.GetValue<string>("Influx:User");
-            Assert.True(usr.Equals(usrVal));
+            usrVal.Should().Be(usr);
 
             string passVal = configObj.GetValue<string>("Influx:Password");
-            Assert.True(pass.Equals(passVal));
+            passVal.Should().Be(pass);
 
             string dbVal = configObj.GetValue<string>("Influx:DBName");
-            Assert.True(db.Equals(dbVal));
+            dbVal.Should().Be(db);
 
             string hostVal = configObj.GetValue<string>("Influx:Address");
-            Assert.True(host.Equals(hostVal));
-
+            hostVal.Should().Be(host);
 
         }
 

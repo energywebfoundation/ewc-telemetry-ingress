@@ -1,8 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
+using FluentAssertions;
 using Microsoft.Extensions.Configuration;
-using Moq;
 using webapi;
 using Xunit;
 
@@ -24,8 +23,7 @@ namespace tests
             km.ProcessKeyCommand("add");
             string fileData = File.ReadAllText(randFileName);
 
-            Assert.True(fileData.Contains("[]"));
-
+            fileData.Should().Contain("[]");
             //removing temp file
             File.Delete(randFileName);
         }
@@ -38,14 +36,14 @@ namespace tests
             pubKeySourceObj.LoadFromFile(randFileName, true);
 
             ConfigurationBuilder cb = new ConfigurationBuilder();
-            string[] args = new string[] { "--validator", "0x0000000965" };
+            string[] args = { "--validator", "0x0000000965" };
             IConfigurationRoot configObj = cb.AddCommandLine(args).Build();
 
             KeyManagement km = new KeyManagement(configObj, pubKeySourceObj);
             km.ProcessKeyCommand("add");
             string fileData = File.ReadAllText(randFileName);
 
-            Assert.True(fileData.Contains("[]"));
+            fileData.Should().Contain("[]");
 
             //removing temp file
             File.Delete(randFileName);
@@ -62,7 +60,7 @@ namespace tests
             pubKeySourceObj.LoadFromFile(randFileName, true);
 
             ConfigurationBuilder cb = new ConfigurationBuilder();
-            string[] args = new string[] { "--validator", validator, "--publickey", pubKey };
+            string[] args = { "--validator", validator, "--publickey", pubKey };
             IConfigurationRoot configObj = cb.AddCommandLine(args).Build();
 
             KeyManagement km = new KeyManagement(configObj, pubKeySourceObj);
@@ -93,16 +91,15 @@ namespace tests
             pubKeySourceObj.AddKey(validator, pubKey);
 
             ConfigurationBuilder cb = new ConfigurationBuilder();
-            string[] args = new string[] { "test", validator };
+            string[] args = { "test", validator };
             IConfigurationRoot configObj = cb.AddCommandLine(args).Build();
 
 
             KeyManagement km = new KeyManagement(configObj, pubKeySourceObj);
             km.ProcessKeyCommand("remove");
-            string fileData = File.ReadAllText(randFileName);
 
             //check the keys should not be removed
-            Assert.True(pubKeySourceObj.GetKeyForNode(validator).Equals(pubKey));
+            pubKeySourceObj.GetKeyForNode(validator).Should().Be(pubKey);
 
             //removing temp file
             File.Delete(randFileName);
@@ -121,18 +118,18 @@ namespace tests
             pubKeySourceObj.AddKey(validator, pubKey);
 
             ConfigurationBuilder cb = new ConfigurationBuilder();
-            string[] args = new string[] { "--validator", validator };
+            string[] args = { "--validator", validator };
             IConfigurationRoot configObj = cb.AddCommandLine(args).Build();
 
 
             KeyManagement km = new KeyManagement(configObj, pubKeySourceObj);
             km.ProcessKeyCommand("remove");
-            string fileData = File.ReadAllText(randFileName);
 
             //check the keys should be removed
             var exception = Assert.Throws<KeyNotFoundException>(() => pubKeySourceObj.GetKeyForNode(validator));
             Assert.NotNull(exception);
-            Assert.True(exception.Message.Contains("Public key not available"));
+
+            exception.Message.Should().Contain("Public key not available");
 
             //removing temp file
             File.Delete(randFileName);
@@ -154,7 +151,7 @@ namespace tests
 
             string fileData = File.ReadAllText(randFileName);
             //there is no change in pub key data file
-            Assert.True(fileData.Contains("[]"));
+            fileData.Should().Contain("[]");
             //removing temp file
             File.Delete(randFileName);
 

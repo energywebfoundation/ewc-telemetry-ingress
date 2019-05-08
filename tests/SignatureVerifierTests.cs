@@ -1,16 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using webapi;
-using webapi.Controllers;
 using Xunit;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Net;
-using System.Linq;
 
 namespace tests
 {

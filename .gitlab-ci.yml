@@ -16,19 +16,26 @@ build-dotnet:
     paths:
       - ingress-app/build/
 
-#test-dotnet:
-#  stage: test
-#  tags:
-#    - short-jobs
-#  image: microsoft/dotnet:2.2-sdk
-#  services:
-#    - influxdb
-#  script:
-#    - curl -i -XPOST http://influxdb:8086/query --data-urlencode "q=CREATE DATABASE telemetry"
-#    - dotnet restore
-#    - dotnet build
-#    - dotnet test
-
+test-dotnet:
+  stage: test
+  tags:
+    - short-jobs
+  image: microsoft/dotnet:2.2-sdk
+  services:
+    - influxdb
+  script:
+    - curl -i -XPOST http://influxdb:8086/query --data-urlencode "q=CREATE DATABASE telemetry"
+    - dotnet tool install -g trx2junit
+    - export PATH="$PATH:/root/.dotnet/tools"
+    - dotnet restore
+    - dotnet build
+    - dotnet test --no-build -v=normal tests --logger "trx;LogFileName=TestResults.trx" /p:CollectCoverage=true /p:Exclude="[xunit.*]*"
+    - mv tests/TestResults/*.trx tests/TestResults/TestResults.trx
+    - trx2junit tests/TestResults/TestResults.trx
+  artifacts:
+    reports:
+      junit: tests/TestResults/TestResults.xml
+      
 package-docker:
   stage: package
   image: docker
@@ -42,7 +49,12 @@ package-docker:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME  .
     - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME $CI_REGISTRY_IMAGE:latest
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME energyweb/telemetry-ingress:latest
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME energyweb/telemetry-ingress:$CI_COMMIT_REF_NAME
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
     - docker push $CI_REGISTRY_IMAGE:latest
+    #- echo "$SECRET_EWF_DOCKER" > ~/.docker/config.json
+    #- docker push energyweb/telemetry-ingress:latest
+    #- docker push energyweb/telemetry-ingress:$CI_COMMIT_REF_NAME
 
 

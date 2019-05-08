@@ -100,11 +100,10 @@ namespace webapi.Controllers
             }
 
             // creating Influx Points contents by joining flushed data
-            var stringContent = new StringContent(
+            StringContent stringContent = new StringContent(
                 string.Join(Environment.NewLine, content),
                 Encoding.UTF8,
                 "application/json");
-            Console.WriteLine("{0} Buffer flush call", (workerQueue ? "Worker " : "Failure Handler "));
 
             HttpResponseMessage response = null;
             try

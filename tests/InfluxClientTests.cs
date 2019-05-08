@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using Newtonsoft.Json.Linq;
 using webapi;
 using webapi.Controllers;
@@ -9,6 +10,7 @@ using Xunit;
 
 namespace tests
 {
+    [Collection("InfluxTestCollection")]
     public class InfluxClientTests
     {
         public static string InfluxCon(LineProtocolConnectionParameters conobj, string query)
@@ -28,7 +30,7 @@ namespace tests
             var conobj = LineProtocolConfiguration.InitConfiguration();
             conobj.FlushBufferItemsSize = 2;
             conobj.FlushBufferSeconds = 30000;
-            InfluxCon(conobj, "DELETE FROM \"datameasurement\"");
+            InfluxCon(conobj, "DROP MEASUREMENT \"datameasurement\"");
 
             List<string> data = new List<string>();
             data.Add("datameasurement,location=us-midwest temperature=82 1465839830100400200");
@@ -48,7 +50,7 @@ namespace tests
 
             }
 
-            System.Threading.Thread.Sleep(1000); //wait for NW latency to Influx
+            Thread.Sleep(1000); //wait for NW latency to Influx
 
 
             JObject pobj = JObject.Parse(InfluxCon(conobj, "SELECT * FROM \"datameasurement\""));
@@ -66,7 +68,8 @@ namespace tests
             var conobj = LineProtocolConfiguration.InitConfiguration();
             conobj.FlushBufferItemsSize = 2;
             conobj.FlushBufferSeconds = 300;
-            InfluxCon(conobj, "DELETE FROM \"datameasurementA\"");
+            //InfluxCon(conobj, "DELETE FROM \"datameasurementA\"");
+            InfluxCon(conobj, "DROP MEASUREMENT \"datameasurementA\"");
 
             List<string> data = new List<string>();
             data.Add("datameasurementA,location=us-midwest temperature=82 1465839830100400200");
@@ -95,14 +98,15 @@ namespace tests
             var conobj = LineProtocolConfiguration.InitConfiguration();
             conobj.FlushBufferItemsSize = 100;
             conobj.FlushBufferSeconds = 1;
-            InfluxCon(conobj, "DELETE FROM \"datameasurementB\"");
+            //InfluxCon(conobj, "DELETE FROM \"datameasurementB\"");
+            InfluxCon(conobj, "DROP MEASUREMENT \"datameasurementB\"");
 
             List<string> data = new List<string>();
             data.Add("datameasurementB,location=us-midwest temperature=82 1465839830100400200");
 
             var influxLib = new InfluxClient(conobj);
             influxLib.Enqueue(data, true);
-            System.Threading.Thread.Sleep(2000); //wait for TIME flush & NW latency to Influx
+            Thread.Sleep(2000); //wait for TIME flush & NW latency to Influx
 
 
             JObject pobj = JObject.Parse(InfluxCon(conobj, "SELECT * FROM \"datameasurementB\""));
@@ -118,7 +122,8 @@ namespace tests
             var conobj = LineProtocolConfiguration.InitConfiguration();
             conobj.FlushBufferItemsSize = 2000;
             conobj.FlushBufferSeconds = 300;
-            InfluxCon(conobj, "DELETE FROM \"datameasurementC\"");
+            //InfluxCon(conobj, "DELETE FROM \"datameasurementC\"");
+            InfluxCon(conobj, "DROP MEASUREMENT \"datameasurementC\"");
 
             List<string> data = new List<string>();
             data.Add("datameasurementC,location=us-midwest temperature=82 1465839830100400200");
@@ -143,7 +148,8 @@ namespace tests
             conobjBufferA.FlushBufferSeconds = 300;
             conobjBufferA.FlushSecondBufferSeconds = 5;
             conobjBufferA.FlushSecondBufferItemsSize = 5;
-            InfluxCon(conobjBufferA, "DELETE FROM \"datameasurementD\"");
+            //InfluxCon(conobjBufferA, "DELETE FROM \"datameasurementD\"");
+            InfluxCon(conobjBufferA, "DROP MEASUREMENT \"datameasurementD\"");
             InfluxCon(conobjBufferA, "DROP DATABASE \"" + conobjBufferA.DBName + "\""); // dropping db so first buffer fail
 
             List<string> data = new List<string>();
@@ -152,12 +158,12 @@ namespace tests
 
             var influxLib = new InfluxClient(conobjBufferA);
             influxLib.Enqueue(data, true);
-            System.Threading.Thread.Sleep(2000);
+            Thread.Sleep(2000);
             InfluxCon(conobjBufferA, "CREATE DATABASE \"" + conobjBufferA.DBName + "\"");
 
             if (!notFlushBeforeTimeInterval)
             {
-                System.Threading.Thread.Sleep((conobjBufferA.FlushSecondBufferSeconds + 1) * 1000); //wait for 2nd buffer to flush
+                Thread.Sleep((conobjBufferA.FlushSecondBufferSeconds + 1) * 1000); //wait for 2nd buffer to flush
             }
 
             JObject pobj = JObject.Parse(InfluxCon(conobjBufferA, "SELECT * FROM \"datameasurementD\""));
@@ -175,7 +181,7 @@ namespace tests
             conobjBufferA.FlushBufferSeconds = 300;
             conobjBufferA.FlushSecondBufferSeconds = 50;
             conobjBufferA.FlushSecondBufferItemsSize = 3;
-            InfluxCon(conobjBufferA, "DELETE FROM \"datameasurementE\"");
+            InfluxCon(conobjBufferA, "DROP MEASUREMENT \"datameasurementE\"");
             InfluxCon(conobjBufferA, "DROP DATABASE \"" + conobjBufferA.DBName + "\"");  // dropping db so first buffer fail
 
             List<string> data = new List<string>();
@@ -184,15 +190,15 @@ namespace tests
 
             var influxLib = new InfluxClient(conobjBufferA);
             influxLib.Enqueue(data, true);
-            System.Threading.Thread.Sleep(1000); //wait before flush call and db creation so flush dnt pass to influx but to 2nd buffer
+            Thread.Sleep(1000); //wait before flush call and db creation so flush dnt pass to influx but to 2nd buffer
             InfluxCon(conobjBufferA, "CREATE DATABASE \"" + conobjBufferA.DBName + "\"");
-            System.Threading.Thread.Sleep(2000); //wait for NW latency to Influx
+            Thread.Sleep(2000); //wait for NW latency to Influx
 
             //directly enqueue item in 2nd buffer to trigger flush
             influxLib.Enqueue("datameasurementE,location=us-east temperature=15 1465839830100400203", false);
 
 
-            System.Threading.Thread.Sleep(3000); //wait for 2nd buffer to flush
+            Thread.Sleep(3000); //wait for 2nd buffer to flush
 
             JObject pobj = JObject.Parse(InfluxCon(conobjBufferA, "SELECT * FROM \"datameasurementE\""));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");
@@ -208,7 +214,7 @@ namespace tests
             conobjBufferA.FlushBufferSeconds = 300;
             conobjBufferA.FlushSecondBufferSeconds = 50;
             conobjBufferA.FlushSecondBufferItemsSize = 42;
-            InfluxCon(conobjBufferA, "DELETE FROM \"datameasurementE\"");
+            InfluxCon(conobjBufferA, "DROP MEASUREMENT \"datameasurementE\"");
             InfluxCon(conobjBufferA, "DROP DATABASE " + conobjBufferA.DBName);  // dropping db so first buffer fail
 
             List<string> data = new List<string>();
@@ -216,14 +222,14 @@ namespace tests
 
             var influxLib = new InfluxClient(conobjBufferA);
             influxLib.Enqueue(data, true);
-            System.Threading.Thread.Sleep(1000); //wait before flush call and db creation so flush dnt pass to influx but to 2nd buffer
+            Thread.Sleep(1000); //wait before flush call and db creation so flush dnt pass to influx but to 2nd buffer
             InfluxCon(conobjBufferA, "CREATE DATABASE \"" + conobjBufferA.DBName + "\"");
-            System.Threading.Thread.Sleep(2000); //wait for NW latency to Influx
+            Thread.Sleep(2000); //wait for NW latency to Influx
 
             influxLib.Enqueue("datameasurementE,location=us-east temperature=15 1465839830100400203", false);
 
 
-            System.Threading.Thread.Sleep(3000); //wait for 2nd buffer to flush
+            Thread.Sleep(3000); //wait for 2nd buffer to flush
 
             JObject pobj = JObject.Parse(InfluxCon(conobjBufferA, "SELECT * FROM \"datameasurementE\""));
             var rows = pobj.SelectTokens("['results'][0].['series'][0].['values']");

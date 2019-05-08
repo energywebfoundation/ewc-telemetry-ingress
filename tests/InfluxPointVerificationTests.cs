@@ -1,4 +1,5 @@
 using System;
+using FluentAssertions;
 using webapi.Controllers;
 using Xunit;
 
@@ -17,7 +18,7 @@ namespace tests
         public void ShouldPassValidPoint(string point)
         {
             bool result = InfluxPointVerifier.VerifyPoint(point);
-            Assert.Equal(true, result);
+            result.Should().BeTrue();
         }
 
 
@@ -29,7 +30,7 @@ namespace tests
             //Assert.Throws<Exception>(() => InfluxPointVerifier.verifyPoint(point));
             var exception = Assert.Throws<Exception>(() => InfluxPointVerifier.VerifyPoint(point));
             Assert.NotNull(exception);
-            Assert.Contains("Measurement name should be valid string", exception.Message.ToString());
+            Assert.Contains("Measurement name should be valid string", exception.Message);
 
         }
 
@@ -76,7 +77,7 @@ namespace tests
             string point = "parity blocknum=123456,numpeers=12,blockts=1465839830100400200,numtxinblock=23,propagationtime=0 1465839830100400200";
 
             bool result = InfluxPointVerifier.VerifyPoint(point);
-            Assert.Equal(true, result);
+            result.Should().BeTrue();
 
         }
 
@@ -86,8 +87,7 @@ namespace tests
             string point = "parity,nodeid=0x000000000000000000 blocknum=123456,numpeers=12,blockts=1465839830100400200,numtxinblock=23,propagationtime=0";
 
             bool result = InfluxPointVerifier.VerifyPoint(point);
-            Assert.Equal(true, result);
-
+            result.Should().BeTrue();
         }
 
         [Fact]
@@ -96,8 +96,7 @@ namespace tests
             string point = "parity blocknum=123456,numpeers=12,blockts=1465839830100400200,numtxinblock=23,propagationtime=0";
 
             bool result = InfluxPointVerifier.VerifyPoint(point);
-            Assert.Equal(true, result);
-
+            result.Should().BeTrue();
         }
 
         [Fact]
