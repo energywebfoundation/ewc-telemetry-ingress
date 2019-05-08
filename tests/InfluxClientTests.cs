@@ -10,6 +10,7 @@ using Xunit;
 
 namespace tests
 {
+    [Collection("InfluxTestCollection")]
     public class InfluxClientTests
     {
         public static string InfluxCon(LineProtocolConnectionParameters conobj, string query)

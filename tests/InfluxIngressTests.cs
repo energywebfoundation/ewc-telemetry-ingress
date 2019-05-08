@@ -8,7 +8,8 @@ using Xunit;
 
 namespace tests
 {
- public class InfluxIngressTests
+    [Collection("InfluxTestCollection")]
+    public class InfluxIngressTests
     {
         [Fact]
         public void EnqueueShouldFailForInvalidPoint()
